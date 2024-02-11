@@ -1,0 +1,18 @@
+{
+  "attributes": [
+    {
+      "name": "aPosition",
+      "type": "vec3"
+    },
+    {
+      "name": "aUV0",
+      "type": "vec2"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "uColor",
+      "type": "vec4"
+    }
+  ]
+}
