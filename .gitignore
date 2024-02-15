@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 run
 .idea
+scripts/libs
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
