@@ -1,17 +1,17 @@
 package me.kalmemarq.server;
 
-import me.kalmemarq.ChatMessage;
-import me.kalmemarq.entity.PlayerEntity;
-import me.kalmemarq.network.NetworkConnection;
-import me.kalmemarq.network.packet.ChunkDataPacket;
-import me.kalmemarq.network.packet.DisconnectPacket;
-import me.kalmemarq.network.packet.LevelInfoPacket;
-import me.kalmemarq.network.packet.LoginPacket;
-import me.kalmemarq.network.packet.MessagePacket;
-import me.kalmemarq.network.packet.PacketListener;
-import me.kalmemarq.network.packet.PlayPacket;
-import me.kalmemarq.network.packet.PosPacket;
-import me.kalmemarq.network.packet.ReadyPlayPacket;
+import me.kalmemarq.common.ChatMessage;
+import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.network.NetworkConnection;
+import me.kalmemarq.common.network.packet.ChunkDataPacket;
+import me.kalmemarq.common.network.packet.DisconnectPacket;
+import me.kalmemarq.common.network.packet.LevelInfoPacket;
+import me.kalmemarq.common.network.packet.LoginPacket;
+import me.kalmemarq.common.network.packet.MessagePacket;
+import me.kalmemarq.common.network.packet.PacketListener;
+import me.kalmemarq.common.network.packet.PlayPacket;
+import me.kalmemarq.common.network.packet.PosPacket;
+import me.kalmemarq.common.network.packet.ReadyPlayPacket;
 
 import java.util.Map;
 

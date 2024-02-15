@@ -1,6 +1,6 @@
 package me.kalmemarq.client.sound;
 
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.resource.DefaultResourcePack;
 import org.lwjgl.openal.AL;

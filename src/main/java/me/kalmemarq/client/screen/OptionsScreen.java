@@ -1,6 +1,6 @@
 package me.kalmemarq.client.screen;
 
-import me.kalmemarq.Utils;
+import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;

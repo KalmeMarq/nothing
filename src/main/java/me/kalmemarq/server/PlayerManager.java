@@ -1,7 +1,7 @@
 package me.kalmemarq.server;
 
-import me.kalmemarq.entity.PlayerEntity;
-import me.kalmemarq.network.NetworkConnection;
+import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.network.NetworkConnection;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

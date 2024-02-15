@@ -1,11 +1,8 @@
 package me.kalmemarq.client.screen;
 
 import me.kalmemarq.client.Client;
-import me.kalmemarq.network.packet.LoginPacket;
-import me.kalmemarq.network.packet.Packet;
-import me.kalmemarq.network.packet.RequestPreviousMessagesPacket;
+import me.kalmemarq.common.network.packet.LoginPacket;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 public class MultiplayerScreen extends Screen {
 	private final Screen parentScreen;

@@ -3,7 +3,7 @@ package me.kalmemarq.client.render;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.kalmemarq.Utils;
+import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;

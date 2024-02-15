@@ -8,11 +8,11 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.screen.TitleScreen;
 import me.kalmemarq.client.texture.Texture;
-import me.kalmemarq.network.packet.MessagePacket;
+import me.kalmemarq.common.network.packet.MessagePacket;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;

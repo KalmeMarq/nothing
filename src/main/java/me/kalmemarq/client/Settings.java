@@ -1,6 +1,6 @@
 package me.kalmemarq.client;
 
-import me.kalmemarq.Utils;
+import me.kalmemarq.common.Utils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

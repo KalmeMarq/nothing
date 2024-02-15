@@ -1,11 +1,11 @@
 package me.kalmemarq.client;
 
-import me.kalmemarq.world.Chunk;
-import me.kalmemarq.world.Level;
-import me.kalmemarq.entity.PlayerEntity;
+import me.kalmemarq.common.world.Chunk;
+import me.kalmemarq.common.world.Level;
+import me.kalmemarq.common.entity.PlayerEntity;
 import me.kalmemarq.client.screen.DisconnectedScreen;
-import me.kalmemarq.network.NetworkConnection;
-import me.kalmemarq.network.packet.*;
+import me.kalmemarq.common.network.NetworkConnection;
+import me.kalmemarq.common.network.packet.*;
 
 class ClientNetworkHandler implements PacketListener {
     private final Client client;

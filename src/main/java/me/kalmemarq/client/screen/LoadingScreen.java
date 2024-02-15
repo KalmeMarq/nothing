@@ -1,7 +1,7 @@
 package me.kalmemarq.client.screen;
 
 import me.kalmemarq.client.Client;
-import me.kalmemarq.network.packet.LoginPacket;
+import me.kalmemarq.common.network.packet.LoginPacket;
 
 public class LoadingScreen extends Screen {
 	public LoadingScreen(Client client, boolean doIntegrated) {

@@ -1,6 +1,6 @@
 package me.kalmemarq.client.resource;
 
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;

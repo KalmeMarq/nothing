@@ -1,6 +1,6 @@
 package me.kalmemarq.client.texture;
 
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;

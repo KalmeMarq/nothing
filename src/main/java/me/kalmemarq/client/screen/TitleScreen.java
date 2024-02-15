@@ -1,9 +1,8 @@
 package me.kalmemarq.client.screen;
 
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 public class TitleScreen extends Screen {
     private String[] items = {

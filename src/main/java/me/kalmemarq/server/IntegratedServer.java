@@ -9,9 +9,9 @@ import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import me.kalmemarq.world.Level;
-import me.kalmemarq.network.NetworkConnection;
-import me.kalmemarq.network.NetworkSide;
+import me.kalmemarq.common.world.Level;
+import me.kalmemarq.common.network.NetworkConnection;
+import me.kalmemarq.common.network.NetworkSide;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;

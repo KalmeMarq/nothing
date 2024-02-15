@@ -1,6 +1,6 @@
 package me.kalmemarq.client.screen;
 
-import me.kalmemarq.Identifier;
+import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.render.Font;
 import me.kalmemarq.client.render.Renderer;

@@ -1,12 +1,12 @@
 package me.kalmemarq.client.render;
 
-import me.kalmemarq.Identifier;
-import me.kalmemarq.Utils;
+import me.kalmemarq.common.Identifier;
+import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.screen.Screen;
-import me.kalmemarq.entity.PlayerEntity;
-import me.kalmemarq.tile.Tile;
-import me.kalmemarq.tile.Tiles;
+import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.tile.Tile;
+import me.kalmemarq.common.tile.Tiles;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
