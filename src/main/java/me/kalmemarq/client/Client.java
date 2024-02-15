@@ -24,14 +24,11 @@ import me.kalmemarq.client.texture.TextureManager;
 import me.kalmemarq.common.network.NetworkConnection;
 import me.kalmemarq.common.network.NetworkSide;
 import me.kalmemarq.common.entity.PlayerEntity;
-import me.kalmemarq.client.screen.Screen;
-import me.kalmemarq.client.screen.TitleScreen;
+import me.kalmemarq.client.screen.Menu;
+import me.kalmemarq.client.screen.TitleMenu;
 import me.kalmemarq.common.network.packet.*;
 import me.kalmemarq.server.IntegratedServer;
 import me.kalmemarq.client.sound.SoundManager;
-import me.kalmemarq.common.tile.Tile;
-import me.kalmemarq.common.tile.Tiles;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
@@ -73,7 +70,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     public final TextureManager textureManager;
     public SoundManager soundManager;
     public Font font;
-    public Screen screen;
+    public Menu menu;
     public boolean showImGuiLayer;
     public ImGuiLayer imGuiLayer;
     public final Path savePath;
@@ -230,7 +227,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 		this.window.setWindowEventHandler(this);
         this.window.setKeyboardEventHandler(new KeyboardHandler(this));
         this.window.setMouseEventHandler(new MouseHandler(this));
-        this.screen = new TitleScreen(this);
+        this.menu = new TitleMenu(this);
         this.font.load();
         this.soundManager.init();
 

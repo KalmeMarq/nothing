@@ -3,7 +3,7 @@ package me.kalmemarq.client.render;
 import me.kalmemarq.common.Identifier;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.Client;
-import me.kalmemarq.client.screen.Screen;
+import me.kalmemarq.client.screen.Menu;
 import me.kalmemarq.common.entity.PlayerEntity;
 import me.kalmemarq.common.tile.Tile;
 import me.kalmemarq.common.tile.Tiles;
@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Renderer {
@@ -190,10 +189,10 @@ public class Renderer {
 			}
 		}
 		
-		if (this.client.screen != null) this.client.screen.render(this.client.window.getFramebufferWidth() / 3, this.client.window.getFramebufferHeight() / 3, 0, 0);
+		if (this.client.menu != null) this.client.menu.render(this.client.window.getFramebufferWidth() / 3, this.client.window.getFramebufferHeight() / 3, 0, 0);
 
 		if (!this.client.window.isFocused()) {
-			Screen.renderFrame(this.client.textureManager, this.client.font, this.client.window.getFramebufferWidth() / 3 / 2, this.client.window.getFramebufferHeight() / 3 / 2 - 20, "Click to Focus".length() * 8 + 16, 24, "Click to Focus", System.currentTimeMillis() / 100 % 4 == 0 ? 0x777777 : 0xFFFFFF);
+			Menu.renderFrame(this.client.textureManager, this.client.font, this.client.window.getFramebufferWidth() / 3 / 2, this.client.window.getFramebufferHeight() / 3 / 2 - 20, "Click to Focus".length() * 8 + 16, 24, "Click to Focus", System.currentTimeMillis() / 100 % 4 == 0 ? 0x777777 : 0xFFFFFF);
 		}
 	}
 	

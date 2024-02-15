@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 public final class Utils {
-    public static final Gson GSON = new GsonBuilder().setLenient().create();
+    public static final Gson GSON = new GsonBuilder().setLenient().setPrettyPrinting().create();
 
     private Utils() {
     }

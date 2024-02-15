@@ -4,14 +4,14 @@ import me.kalmemarq.client.Client;
 import me.kalmemarq.common.network.packet.LoginPacket;
 import org.lwjgl.glfw.GLFW;
 
-public class MultiplayerScreen extends Screen {
-	private final Screen parentScreen;
+public class MultiplayerMenu extends Menu {
+	private final Menu parentScreen;
 	
     private int selectedIndex;
     private String ip = "";
     private String port = "";
 
-    public MultiplayerScreen(Client client, Screen parentScreen) {
+    public MultiplayerMenu(Client client, Menu parentScreen) {
         super(client);
 		this.parentScreen = parentScreen;
     }
@@ -19,7 +19,7 @@ public class MultiplayerScreen extends Screen {
     @Override
     public void keyPressed(int key, int mods) {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
-            this.client.screen = this.parentScreen;
+            this.client.menu = this.parentScreen;
             return;
         }
 
@@ -44,7 +44,7 @@ public class MultiplayerScreen extends Screen {
             if (this.selectedIndex == 2) {
                 if (this.client.connect(this.ip, Integer.parseInt(this.port))) {
                     this.client.connection.sendPacket(new LoginPacket(this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
-                    this.client.screen = new LoadingScreen(this.client, false);
+                    this.client.menu = new LoadingMenu(this.client, false);
                 }
             }
         }

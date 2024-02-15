@@ -5,10 +5,10 @@ import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-public class PauseScreen extends Screen {
+public class PauseMenu extends Menu {
     private int selectedIndex;
 
-    public PauseScreen(Client client) {
+    public PauseMenu(Client client) {
         super(client);
     }
 
@@ -23,12 +23,12 @@ public class PauseScreen extends Screen {
 
         if (key == GLFW.GLFW_KEY_ENTER) {
             if (this.selectedIndex == 0) {
-                this.client.screen = null;
+                this.client.menu = null;
             } else if (this.selectedIndex == 1) {
                 if (this.client.integratedServer != null) this.client.integratedServer.openToLan(8080);
             } else if (this.selectedIndex == 2) {
                 this.client.disconnect();
-                this.client.screen = new TitleScreen(this.client);
+                this.client.menu = new TitleMenu(this.client);
             }
         }
     }

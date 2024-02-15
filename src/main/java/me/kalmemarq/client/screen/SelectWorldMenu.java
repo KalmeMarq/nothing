@@ -2,8 +2,8 @@ package me.kalmemarq.client.screen;
 
 import me.kalmemarq.client.Client;
 
-public class CreateWorldScreen extends Screen {
-	public CreateWorldScreen(Client client) {
+public class SelectWorldMenu extends Menu {
+	public SelectWorldMenu(Client client) {
 		super(client);
 	}
 

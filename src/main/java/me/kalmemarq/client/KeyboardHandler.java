@@ -1,7 +1,7 @@
 package me.kalmemarq.client;
 
 import me.kalmemarq.client.render.Window;
-import me.kalmemarq.client.screen.PauseScreen;
+import me.kalmemarq.client.screen.PauseMenu;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyboardHandler implements Window.KeyboardEventHandler {
@@ -25,23 +25,23 @@ public class KeyboardHandler implements Window.KeyboardEventHandler {
 			this.client.window.toggleFullscreen();
 		}
 
-        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_ESCAPE && this.client.connection != null && this.client.screen == null) {
-            this.client.screen = new PauseScreen(this.client);
+        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_ESCAPE && this.client.connection != null && this.client.menu == null) {
+            this.client.menu = new PauseMenu(this.client);
         }
 
-        if (this.client.screen == null) return;
+        if (this.client.menu == null) return;
 
         if (action == GLFW.GLFW_RELEASE) {
-            this.client.screen.keyReleased(key, mods);
+            this.client.menu.keyReleased(key, mods);
         } else {
-            this.client.screen.keyPressed(key, mods);
+            this.client.menu.keyPressed(key, mods);
         }
     }
 
     @Override
     public void onCharTyped(int codepoint) {
-        if (this.client.screen == null) return;
+        if (this.client.menu == null) return;
 
-        this.client.screen.charTyped(codepoint);
+        this.client.menu.charTyped(codepoint);
     }
 }

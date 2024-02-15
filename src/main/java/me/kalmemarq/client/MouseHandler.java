@@ -14,12 +14,12 @@ public class MouseHandler implements Window.MouseEventHandler {
 
     @Override
     public void onMouseButton(int button, int action, int mods) {
-		if (this.client.screen == null) return;
+		if (this.client.menu == null) return;
 		
 		if (action != GLFW.GLFW_RELEASE) {
-			this.client.screen.mousePressed(button, (int) (x / 3), (int) (y / 3));
+			this.client.menu.mousePressed(button, (int) (x / 3), (int) (y / 3));
 		} else {
-			this.client.screen.mouseReleased(button, (int) (x / 3), (int) (y / 3));
+			this.client.menu.mouseReleased(button, (int) (x / 3), (int) (y / 3));
 		}
     }
 

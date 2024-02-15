@@ -3,8 +3,8 @@ package me.kalmemarq.client.screen;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.common.network.packet.LoginPacket;
 
-public class LoadingScreen extends Screen {
-	public LoadingScreen(Client client, boolean doIntegrated) {
+public class LoadingMenu extends Menu {
+	public LoadingMenu(Client client, boolean doIntegrated) {
 		super(client);
 
 		Thread doStuff = new Thread(() -> {

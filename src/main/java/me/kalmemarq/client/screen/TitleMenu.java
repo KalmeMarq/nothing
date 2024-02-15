@@ -4,7 +4,7 @@ import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
 
-public class TitleScreen extends Screen {
+public class TitleMenu extends Menu {
     private String[] items = {
             "Singleplayer",
             "Multiplayer",
@@ -13,7 +13,7 @@ public class TitleScreen extends Screen {
     };
     private int selectedIndex;
 
-    public TitleScreen(Client client) {
+    public TitleMenu(Client client) {
         super(client);
     }
 
@@ -32,11 +32,11 @@ public class TitleScreen extends Screen {
             this.client.getSoundManager().play(Identifier.of("minicraft:sounds/confirm.ogg"), 1.0f, 1.0f);
 
             if (this.selectedIndex == 0) {
-               this.client.screen = new LoadingScreen(this.client, true);
+               this.client.menu = new LoadingMenu(this.client, true);
             } else if (this.selectedIndex == 1) {
-                this.client.screen = new MultiplayerScreen(this.client, this);
+                this.client.menu = new MultiplayerMenu(this.client, this);
             } else if (this.selectedIndex == 2) {
-                this.client.screen = new OptionsScreen(this.client, this);
+                this.client.menu = new OptionsMenu(this.client, this);
             } else if (this.selectedIndex == 3) {
                 this.client.shutdown();
             }

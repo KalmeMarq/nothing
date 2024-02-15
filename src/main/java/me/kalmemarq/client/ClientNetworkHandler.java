@@ -3,7 +3,7 @@ package me.kalmemarq.client;
 import me.kalmemarq.common.world.Chunk;
 import me.kalmemarq.common.world.Level;
 import me.kalmemarq.common.entity.PlayerEntity;
-import me.kalmemarq.client.screen.DisconnectedScreen;
+import me.kalmemarq.client.screen.DisconnectedMenu;
 import me.kalmemarq.common.network.NetworkConnection;
 import me.kalmemarq.common.network.packet.*;
 
@@ -21,7 +21,7 @@ class ClientNetworkHandler implements PacketListener {
 	public void onDisconnect(DisconnectPacket packet) {
 		this.client.connectionText.set(packet.getReason());
 		this.client.disconnect();
-		this.client.screen = new DisconnectedScreen(this.client);
+		this.client.menu = new DisconnectedMenu(this.client);
 	}
 
 	@Override
@@ -84,6 +84,6 @@ class ClientNetworkHandler implements PacketListener {
 		this.client.level = this.storageLevel;
 		this.client.player.setLevel(this.storageLevel);
 		this.storageLevel = null;
-		this.client.screen = null;
+		this.client.menu = null;
 	}
 }

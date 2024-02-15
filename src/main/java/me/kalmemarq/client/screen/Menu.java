@@ -7,11 +7,11 @@ import me.kalmemarq.client.render.Renderer;
 import me.kalmemarq.client.texture.TextureManager;
 import org.lwjgl.opengl.GL11;
 
-public class Screen {
+public class Menu {
     protected Client client;
     protected Font font;
 
-    public Screen(Client client) {
+    public Menu(Client client) {
         this.client = client;
         this.font = client.getFont();
     }

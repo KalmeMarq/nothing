@@ -5,12 +5,12 @@ import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-public class OptionsScreen extends Screen {
-	private final Screen parentScreen;
+public class OptionsMenu extends Menu {
+	private final Menu parentScreen;
 	
     private int selectedIndex;
 
-    public OptionsScreen(Client client, Screen parentScreen) {
+    public OptionsMenu(Client client, Menu parentScreen) {
         super(client);
 		this.parentScreen = parentScreen;
     }
@@ -18,7 +18,7 @@ public class OptionsScreen extends Screen {
     @Override
     public void keyPressed(int key, int mods) {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
-            this.client.screen = this.parentScreen;
+            this.client.menu = this.parentScreen;
             return;
         }
 

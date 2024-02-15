@@ -10,7 +10,7 @@ import imgui.type.ImBoolean;
 import imgui.type.ImString;
 import me.kalmemarq.common.Identifier;
 import me.kalmemarq.client.Client;
-import me.kalmemarq.client.screen.TitleScreen;
+import me.kalmemarq.client.screen.TitleMenu;
 import me.kalmemarq.client.texture.Texture;
 import me.kalmemarq.common.network.packet.MessagePacket;
 import org.lwjgl.glfw.GLFW;
@@ -89,7 +89,7 @@ public class ImGuiLayer {
                 }
 				
 				if (ImGui.menuItem("Open Title")) {
-                    this.client.screen = new TitleScreen(this.client);
+                    this.client.menu = new TitleMenu(this.client);
                 }
 
                 if (ImGui.menuItem("Messages")) {
@@ -101,8 +101,8 @@ public class ImGuiLayer {
                     ImGui.text("Player Y: " + this.client.player.y);
                 }
 				
-				if (this.client.screen != null) {
-					ImGui.text("Screen: " + this.client.screen.getClass().getSimpleName());
+				if (this.client.menu != null) {
+					ImGui.text("Screen: " + this.client.menu.getClass().getSimpleName());
 				}
 
                 ImGui.endMenu();
