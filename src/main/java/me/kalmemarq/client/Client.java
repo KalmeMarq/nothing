@@ -86,7 +86,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.rp = DefaultResourcePack.get();
         this.textureManager = new TextureManager();
         this.font = new Font(this.textureManager);
-        this.soundManager = new SoundManager();
+        this.soundManager = new SoundManager(this);
         this.settings = new Settings(this.savePath);
         this.settings.load();
         this.window = new Window(800, 400, "Minicraft");

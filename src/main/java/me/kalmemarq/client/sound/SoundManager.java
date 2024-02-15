@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class SoundManager {
     private boolean initialized;
+	private Client client;
     private long device = -1;
     private ALCCapabilities deviceCaps;
     private long context;
@@ -34,6 +35,10 @@ public class SoundManager {
     private Map<Identifier, Integer> buffers = new HashMap<>();
     private List<SoundSource> sources = new ArrayList<>();
 	private SoundListener soundListener = new SoundListener();
+	
+	public SoundManager(Client client) {
+		this.client = client;
+	}
 	
     public void init() {
         this.device = ALC10.alcOpenDevice((ByteBuffer) null);
@@ -114,7 +119,7 @@ public class SoundManager {
 
         SoundSource source = new SoundSource();
         source.setBuffer(buffer);
-        source.setVolume(volume);
+        source.setVolume(volume * (this.client.settings.soundVolume / 100.0f));
         source.setPitch(pitch);
         source.play();
 

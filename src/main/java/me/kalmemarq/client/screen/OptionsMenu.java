@@ -23,10 +23,10 @@ public class OptionsMenu extends Menu {
         }
 
         if (key == GLFW.GLFW_KEY_DOWN) {
-            this.selectedIndex = (this.selectedIndex + 1) % 4;
+            this.selectedIndex = (this.selectedIndex + 1) % 5;
         } else if (key == GLFW.GLFW_KEY_UP) {
             --this.selectedIndex;
-            if (this.selectedIndex < 0) this.selectedIndex = 3;
+            if (this.selectedIndex < 0) this.selectedIndex = 4;
         }
 
         if (key == GLFW.GLFW_KEY_BACKSPACE && this.selectedIndex == 0) {
@@ -39,10 +39,12 @@ public class OptionsMenu extends Menu {
             if (this.selectedIndex == 1) this.client.settings.playerColorR = Utils.clamp(this.client.settings.playerColorR - 1, 0, 255);
             if (this.selectedIndex == 2) this.client.settings.playerColorG = Utils.clamp(this.client.settings.playerColorG - 1, 0, 255);
             if (this.selectedIndex == 3) this.client.settings.playerColorB = Utils.clamp(this.client.settings.playerColorB - 1, 0, 255);
+            if (this.selectedIndex == 4) this.client.settings.soundVolume = Utils.clamp(this.client.settings.soundVolume - 1, 0, 100);
         } else if (key == GLFW.GLFW_KEY_RIGHT) {
             if (this.selectedIndex == 1) this.client.settings.playerColorR = Utils.clamp(this.client.settings.playerColorR + 1, 0, 255);
             if (this.selectedIndex == 2) this.client.settings.playerColorG = Utils.clamp(this.client.settings.playerColorG + 1, 0, 255);
             if (this.selectedIndex == 3) this.client.settings.playerColorB = Utils.clamp(this.client.settings.playerColorB + 1, 0, 255);
+            if (this.selectedIndex == 4) this.client.settings.soundVolume = Utils.clamp(this.client.settings.soundVolume + 1, 0, 100);
         }
     }
 
@@ -70,5 +72,7 @@ public class OptionsMenu extends Menu {
         GL11.glEnd();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    }
+
+		this.font.drawText("Sound Volume: " + this.client.settings.soundVolume + "%", 20, 98, this.selectedIndex == 4 ? 0xFFFFFF : 0x909090);
+	}
 }

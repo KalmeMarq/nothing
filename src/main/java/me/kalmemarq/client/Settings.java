@@ -11,8 +11,10 @@ import java.nio.file.Path;
 
 public class Settings {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
-    private final Path optionsPath;
-    public String username = "Player";
+    
+	private final Path optionsPath;
+    public int soundVolume = 100;
+	public String username = "Player";
     public int playerColorR = 255;
     public int playerColorG = 255;
     public int playerColorB = 255;
@@ -44,6 +46,10 @@ public class Settings {
 			if (obj.has("playerColorB")) {
 				this.playerColorB = obj.get("playerColorB").getAsInt();
 			}
+
+			if (obj.has("soundVolume")) {
+				this.soundVolume = obj.get("soundVolume").getAsInt();
+			}
 		} catch (IOException e) {
 			LOGGER.warn("Failed to load settings from disk", e);
         }
@@ -56,6 +62,7 @@ public class Settings {
 		obj.addProperty("playerColorR", this.playerColorR);
 		obj.addProperty("playerColorG", this.playerColorG);
 		obj.addProperty("playerColorB", this.playerColorB);
+		obj.addProperty("soundVolume", this.soundVolume);
 
         try {
             Files.writeString(this.optionsPath, Utils.GSON.toJson(obj));
