@@ -5,17 +5,18 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.ByteBuffer;
 
 public class BufferBuilder {
+	private boolean disposed;
     private final ByteBuffer buffer;
     private int vertexCount;
     private int offset;
 	private PrimitiveType primitiveType;
-	private VertexFormat format;
+	private VertexLayout format;
 
     public BufferBuilder(int initialCapacity) {
         this.buffer = MemoryUtil.memAlloc(initialCapacity);
     }
 
-    public void begin(PrimitiveType primitiveType, VertexFormat format) {
+    public void begin(PrimitiveType primitiveType, VertexLayout format) {
         this.offset = 0;
         this.vertexCount = 0;
 		this.primitiveType = primitiveType;
@@ -60,8 +61,13 @@ public class BufferBuilder {
 
     public void close() {
         MemoryUtil.memFree(this.buffer);
+		this.disposed = true;
     }
-	
-	public record BuiltBuffer(ByteBuffer buffer, VertexFormat format, PrimitiveType primitiveType, int vertexCount) {
+
+	public boolean isDisposed() {
+		return this.disposed;
+	}
+
+	public record BuiltBuffer(ByteBuffer buffer, VertexLayout format, PrimitiveType primitiveType, int vertexCount) {
 	}
 }

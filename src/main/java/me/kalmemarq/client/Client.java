@@ -242,6 +242,8 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         if (this.connection != null) this.connection.tick();
 
         this.soundManager.tick();
+		
+		this.renderer.tick();
     }
 
     public Font getFont() {

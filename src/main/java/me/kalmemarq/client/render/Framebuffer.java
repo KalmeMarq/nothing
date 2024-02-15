@@ -142,11 +142,11 @@ public class Framebuffer {
         shader.colorUniform.set(1.0f, 1.0f, 1.0f, 1.0f);
 		shader.colorUniform.upload();
 
-		VertexFormat.POSITION_TEXTURE.enable();
+		VertexLayout.POSITION_TEXTURE.enable();
 		
         GL30.glDrawElements(GL30.GL_TRIANGLES, 6, GL30.GL_UNSIGNED_BYTE, 0);
 
-		VertexFormat.POSITION_TEXTURE.disable();
+		VertexLayout.POSITION_TEXTURE.disable();
 		
         GL30.glBindVertexArray(0);
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);

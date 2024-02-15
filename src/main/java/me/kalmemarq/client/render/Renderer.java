@@ -12,14 +12,36 @@ import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class Renderer {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(Renderer.class);
 	private final Client client;
+	private List<VertexBuffer> vertexBuffers = new ArrayList<>();
+	private List<BufferBuilder> bufferBuilders = new ArrayList<>();
 	private Matrix4f projectionMatrix = new Matrix4f();
 	private Matrix4f modelViewMatrix = new Matrix4f();
 
 	public Renderer(Client client) {
 		this.client = client;
+	}
+
+	public VertexBuffer createVertexBuffer() {
+		VertexBuffer vertexBuffer = new VertexBuffer();
+		this.vertexBuffers.add(vertexBuffer);
+		return vertexBuffer;
+	}
+
+	public BufferBuilder createBufferBuilder(int initialCapacity) {
+		BufferBuilder bufferBuilder = new BufferBuilder(initialCapacity);
+		this.bufferBuilders.add(bufferBuilder);
+		return bufferBuilder;
+	}
+	
+	public void tick() {
+        this.bufferBuilders.removeIf(BufferBuilder::isDisposed);
 	}
 	
 	public void render() {
