@@ -5,18 +5,18 @@ import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.screen.Menu;
 import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.logging.LogManager;
+import me.kalmemarq.common.logging.Logger;
 import me.kalmemarq.common.tile.Tile;
 import me.kalmemarq.common.tile.Tiles;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Renderer {
-	protected static final Logger LOGGER = LoggerFactory.getLogger(Renderer.class);
+	protected static final Logger LOGGER = LogManager.getLogger(Renderer.class);
 	private final Client client;
 	private List<VertexBuffer> vertexBuffers = new ArrayList<>();
 	private List<BufferBuilder> bufferBuilders = new ArrayList<>();

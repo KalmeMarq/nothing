@@ -5,11 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
+import me.kalmemarq.common.logging.LogManager;
+import me.kalmemarq.common.logging.Logger;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Shader {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
+    protected static final Logger LOGGER = LogManager.getLogger(Shader.class);
     private int id;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
 	private final Map<String, Uniform> uniforms = new HashMap<>();

@@ -39,10 +39,6 @@ dependencies {
     implementation 'io.netty:netty-resolver:4.1.106.Final'
     implementation 'io.netty:netty-handler:4.1.106.Final'
 
-    implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.22.1'
-
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "io.github.spair:imgui-java-binding:1.86.11"

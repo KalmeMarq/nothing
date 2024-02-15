@@ -2,9 +2,12 @@ package me.kalmemarq.server;
 
 import me.kalmemarq.argoption.ArgOption;
 import me.kalmemarq.argoption.ArgOptionParser;
+import me.kalmemarq.common.logging.LogManager;
 
 public class Main {
     public static void main(String[] args) {
+		LogManager.addStream(System.out);
+		
         ArgOptionParser optionParser = new ArgOptionParser();
         ArgOption<String> serverIpArg = optionParser.add("serverIp", String.class).defaultsTo("localhost");
         ArgOption<Integer> serverPortArg = optionParser.add("serverPort", Integer.class).defaultsTo(8080);

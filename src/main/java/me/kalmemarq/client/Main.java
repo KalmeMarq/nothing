@@ -3,6 +3,7 @@ package me.kalmemarq.client;
 import me.kalmemarq.argoption.ArgOption;
 import me.kalmemarq.argoption.ArgOptionParser;
 import me.kalmemarq.client.resource.DefaultResourcePack;
+import me.kalmemarq.common.logging.LogManager;
 import org.lwjgl.system.Configuration;
 
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) {
+		LogManager.addStream(System.out);
+		
 		Configuration.DEBUG.set(true);
 		Configuration.DEBUG_LOADER.set(true);
 		Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);

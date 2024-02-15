@@ -2,15 +2,15 @@ package me.kalmemarq.client;
 
 import com.google.gson.JsonObject;
 import me.kalmemarq.common.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import me.kalmemarq.common.logging.LogManager;
+import me.kalmemarq.common.logging.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Settings {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
+	private static final Logger LOGGER = LogManager.getLogger(Settings.class);
     
 	private final Path optionsPath;
     public int soundVolume = 100;

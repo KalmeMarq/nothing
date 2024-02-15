@@ -10,6 +10,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import me.kalmemarq.common.logging.LogManager;
+import me.kalmemarq.common.logging.Logger;
 import me.kalmemarq.common.world.Level;
 import me.kalmemarq.common.ThreadExecutor;
 import me.kalmemarq.client.render.Font;
@@ -31,8 +33,6 @@ import me.kalmemarq.server.IntegratedServer;
 import me.kalmemarq.client.sound.SoundManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Client extends ThreadExecutor implements Window.WindowEventHandler {
-    public static final Logger LOGGER = LoggerFactory.getLogger("Client");
+    public static final Logger LOGGER = LogManager.getLogger("Client");
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/dd/MM HH:mm:ss").withZone(ZoneId.systemDefault());
     public EventLoopGroup eventLoopGroup;
 

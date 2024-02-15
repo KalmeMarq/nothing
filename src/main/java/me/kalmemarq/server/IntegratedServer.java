@@ -66,7 +66,7 @@ public class IntegratedServer extends Server {
 				}
 			});
 
-		this.level = new Level(8 * 4, 8 * 4);
+		this.level = new Level(128, 128);
 		this.level.generate();
 
 		try {
