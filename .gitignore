@@ -6,6 +6,9 @@ build/
 run
 .idea
 scripts/libs
+hs_err_*
+imgui.ini
+settings.txt
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

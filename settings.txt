@@ -1,4 +1,0 @@
-username=Player
-playerColorR=255
-playerColorG=255
-playerColorB=255
