@@ -1,5 +1,6 @@
 package me.kalmemarq.client.texture;
 
+import me.kalmemarq.Identifier;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.resource.DefaultResourcePack;
 import org.lwjgl.opengl.GL11;
@@ -12,13 +13,13 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 public class Texture {
-    private final String path;
+    private final Identifier identifier;
     private int handle = -1;
     private int width;
     private int height;
 
-    public Texture(String path) {
-        this.path = path;
+    public Texture(Identifier identifier) {
+        this.identifier = identifier;
     }
 
     public int getId() {
@@ -33,15 +34,15 @@ public class Texture {
         return this.height;
     }
 
-    public String getPath() {
-        return this.path;
-    }
+	public Identifier getIdentifier() {
+		return this.identifier;
+	}
 
-    public void load() {
+	public void load() {
         var rp = DefaultResourcePack.get();
 
         try {
-            ByteBuffer data = Client.getByteBufferFromInputStream(rp.get(this.path).get().get());
+            ByteBuffer data = Client.getByteBufferFromInputStream(rp.getResource(this.identifier).get().inputSupplier().get());
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer widthP = stack.mallocInt(1);
                 IntBuffer heightP = stack.mallocInt(1);

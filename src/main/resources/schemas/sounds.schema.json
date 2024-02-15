@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "patternProperties": {
+    "[a-zA-Z0-9_]:[a-zA-Z0-9_]": {
+      "type": "object",
+      "properties": {
+        "volume": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pitch": {
+          "type": "number",
+          "minimum": 0
+        },
+        "path": {
+          "type": "string"
+        },
+        "sounds": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "volume": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "pitch": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

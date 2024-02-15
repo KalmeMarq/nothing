@@ -3,14 +3,20 @@ package me.kalmemarq.client;
 import imgui.type.ImString;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import me.kalmemarq.Identifier;
+import me.kalmemarq.world.Level;
+import me.kalmemarq.ThreadExecutor;
 import me.kalmemarq.client.render.Font;
 import me.kalmemarq.client.render.Framebuffer;
 import me.kalmemarq.client.render.ImGuiLayer;
+import me.kalmemarq.client.render.Renderer;
 import me.kalmemarq.client.render.Shader;
 import me.kalmemarq.client.render.Window;
 import me.kalmemarq.client.resource.DefaultResourcePack;
@@ -18,21 +24,14 @@ import me.kalmemarq.client.resource.ResourcePack;
 import me.kalmemarq.client.texture.TextureManager;
 import me.kalmemarq.network.NetworkConnection;
 import me.kalmemarq.network.NetworkSide;
-import me.kalmemarq.Player;
+import me.kalmemarq.entity.PlayerEntity;
 import me.kalmemarq.client.screen.Screen;
 import me.kalmemarq.client.screen.TitleScreen;
-import me.kalmemarq.network.packet.WorldDataPacket;
-import me.kalmemarq.server.Server;
-import me.kalmemarq.Utils;
-import me.kalmemarq.network.packet.DisconnectPacket;
-import me.kalmemarq.network.packet.MessagePacket;
-import me.kalmemarq.network.packet.Packet;
-import me.kalmemarq.network.packet.PacketDecoder;
-import me.kalmemarq.network.packet.PacketEncoder;
-import me.kalmemarq.network.packet.PlayPacket;
-import me.kalmemarq.network.packet.PosPacket;
-import me.kalmemarq.network.packet.RemovePlayerPacket;
+import me.kalmemarq.network.packet.*;
+import me.kalmemarq.server.IntegratedServer;
 import me.kalmemarq.client.sound.SoundManager;
+import me.kalmemarq.tile.Tile;
+import me.kalmemarq.tile.Tiles;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
@@ -53,32 +52,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Client implements Window.WindowEventHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger("Client");
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/dd/MM HH:mm:ss").withZone(ZoneId.systemDefault());
-    private EventLoopGroup eventLoopGroup;
+public class Client extends ThreadExecutor implements Window.WindowEventHandler {
+    public static final Logger LOGGER = LoggerFactory.getLogger("Client");
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/dd/MM HH:mm:ss").withZone(ZoneId.systemDefault());
+    public EventLoopGroup eventLoopGroup;
 
-    private boolean running;
-    private final ResourcePack rp;
+	private final Thread thread;
+    public boolean running;
+    public final ResourcePack rp;
     public final Window window;
 
     public final List<String> messages = new ArrayList<>();
 
     public NetworkConnection connection;
-    public Server integratedServer;
-    private boolean hasOpenToLan = false;
+    public IntegratedServer integratedServer;
+    public boolean hasOpenToLan = false;
     public final ImString connectionText = new ImString();
 
-    private final Map<String, Player> playerList = new ConcurrentHashMap<>();
-    public Player player;
+    public final Map<String, PlayerEntity> playerList = new ConcurrentHashMap<>();
+    public PlayerEntity player;
     public final TextureManager textureManager;
-    private SoundManager soundManager;
-    private Font font;
+    public SoundManager soundManager;
+    public Font font;
     public Screen screen;
     public boolean showImGuiLayer;
-    private ImGuiLayer imGuiLayer;
+    public ImGuiLayer imGuiLayer;
     public final Path savePath;
     public final Settings settings;
+	public int currentFps;
+	public int currentTicks;
+	public Level level;
+	public Renderer renderer;
+	public boolean showDebugHud;
 
     public Client(Path savePath) {
         this.savePath = savePath;
@@ -88,9 +93,20 @@ public class Client implements Window.WindowEventHandler {
         this.soundManager = new SoundManager();
         this.settings = new Settings(this.savePath);
         this.settings.load();
-        this.window = new Window(800, 400, "Test Game");
+        this.window = new Window(800, 400, "Minicraft");
         this.imGuiLayer = new ImGuiLayer(this);
+		this.renderer = new Renderer(this);
+		this.thread = Thread.currentThread();
     }
+
+	@Override
+	public Thread getThread() {
+		return this.thread;
+	}
+
+	@Override
+	public void onFocusChanged() {
+	}
 
 	@Override
 	public void onResize() {
@@ -101,42 +117,12 @@ public class Client implements Window.WindowEventHandler {
         return this.soundManager;
     }
 
-    private void handlePacket(NetworkConnection conn, Packet packet) {
-        if (packet instanceof MessagePacket messagePacket) {
-            this.messages.add("[" + DATE_FORMATTER.format(messagePacket.getTimestamp()) + "] " + messagePacket.getMessage());
-        } else if (packet instanceof DisconnectPacket disconnectPacket) {
-            this.connectionText.set(disconnectPacket.getReason());
-            this.disconnect();
-        } else if (packet instanceof RemovePlayerPacket removePlayerPacket) {
-             this.playerList.remove(removePlayerPacket.getUsername());
-        } else if (packet instanceof PosPacket posPacket) {
-            Player p = this.playerList.get(posPacket.getUsername());
-            if (p == null) {
-                p = new Player();
-                p.color = posPacket.getColor();
-                this.playerList.put(posPacket.getUsername(), p);
-            }
-            p.prevX = p.x;
-            p.prevY = p.y;
-            p.x = posPacket.getX();
-            p.y = posPacket.getY();
-            p.dir = posPacket.getDir();
-        } else if (packet instanceof PlayPacket playPacket) {
-            this.player = new Player();
-            this.player.x = playPacket.getX();
-            this.player.y = playPacket.getY();
-            this.player.prevX = this.player.x;
-            this.player.prevY = this.player.y;
-            this.player.color = playPacket.getColor();
-            this.player.dir = playPacket.getDir();
-        } else if (packet instanceof WorldDataPacket worldDataPacket) {
-        }
-    }
-
     public boolean connect(String ip, int port) {
         if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup();
 
-        NetworkConnection connection = new NetworkConnection(NetworkSide.Client, this::handlePacket);
+        NetworkConnection connection = new NetworkConnection(NetworkSide.CLIENT, this);
+		ClientNetworkHandler handler = new ClientNetworkHandler(this, connection);
+		connection.setListener(handler);
 
         Bootstrap bootstrap = new Bootstrap()
                 .group(this.eventLoopGroup)
@@ -144,7 +130,11 @@ public class Client implements Window.WindowEventHandler {
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
-                        ch.pipeline().addLast(new PacketDecoder(), new PacketEncoder(), connection);
+						try {
+							ch.config().setOption(ChannelOption.TCP_NODELAY, true);
+						} catch (ChannelException ignored) {
+						}
+						NetworkConnection.addCommonHandlers(ch.pipeline(), connection);
                     }
                 });
 
@@ -161,7 +151,7 @@ public class Client implements Window.WindowEventHandler {
     }
 
     public boolean startIntegrated() {
-        Server server = new Server();
+		IntegratedServer server = new IntegratedServer();
         SocketAddress address = server.startLocal();
 
         if (address == null) {
@@ -173,7 +163,9 @@ public class Client implements Window.WindowEventHandler {
 
         if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup();
 
-        NetworkConnection connection = new NetworkConnection(NetworkSide.Client, this::handlePacket);
+        NetworkConnection connection = new NetworkConnection(NetworkSide.CLIENT, this);
+		ClientNetworkHandler handler = new ClientNetworkHandler(this, connection);
+		connection.setListener(handler);
 
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -182,8 +174,12 @@ public class Client implements Window.WindowEventHandler {
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
-                        ch.pipeline().addLast(new PacketDecoder(), new PacketEncoder(), connection);
-                    }
+						try {
+							ch.config().setOption(ChannelOption.TCP_NODELAY, true);
+						} catch (ChannelException ignored) {
+						}
+						ch.pipeline().addLast("handler", connection);
+					}
                 });
             bootstrap.connect(address).syncUninterruptibly();
             this.connectionText.set("");
@@ -201,7 +197,7 @@ public class Client implements Window.WindowEventHandler {
             this.connection.sendPacket(new PosPacket(this.settings.username, this.player.x, this.player.y, 0, this.player.dir));
         }
 
-        if (this.player != null) {
+        if (this.player != null && this.level != null) {
             this.player.prevX = this.player.x;
             this.player.prevY = this.player.y;
 
@@ -229,8 +225,19 @@ public class Client implements Window.WindowEventHandler {
             if (ya < 0) this.player.dir = 1;
             if (ya > 0) this.player.dir = 0;
 
-            this.player.x += xa * 2f;
-            this.player.y += ya * 2f;
+			int xx = (int) ((this.player.x + (xa > 0 ? 6 : -6) + xa) / 16);
+			int yy = (int) ((this.player.y + (ya > 0 ? 6 : -6) + ya) / 16);
+			
+			int tilea = this.level.getTileId(xx, yy);
+			Tile tile = Tiles.REGISTRY.getValueByRawId(tilea);
+			
+			if (tile != null && tile.isSolid()) {
+				xa = 0.0f;
+				ya = 0.0f;
+			}
+			
+            this.player.x += xa * 1f;
+            this.player.y += ya * 1f;
         }
 
         if (this.connection != null) this.connection.tick();
@@ -265,9 +272,6 @@ public class Client implements Window.WindowEventHandler {
         f.create(this.window.getFramebufferWidth(), this.window.getFramebufferHeight());
 
         Shader shader = new Shader("blit_screen");
-        for (Map.Entry<String, Integer> entry : shader.getUniformLocations().entrySet()) {
-            LOGGER.info("Name: {} | Loc: {}", entry.getKey(), entry.getValue());
-        }
 
         while (this.running) {
             if (this.window.shouldClose()) {
@@ -275,9 +279,11 @@ public class Client implements Window.WindowEventHandler {
             }
 
             this.window.pollEvents();
+			
+			this.runTasks();
 
             long nowa = System.nanoTime();
-            double nsPerTick = 1E9D / 20;
+            double nsPerTick = 1E9D / 60;
             unprocessed += (nowa - lastTimeTick) / nsPerTick;
             lastTimeTick = nowa;
             while (unprocessed >= 1) {
@@ -293,91 +299,14 @@ public class Client implements Window.WindowEventHandler {
             GL11.glClearColor(0.1f, 0.5f, 0.7f, 1.0f);
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-            GL11.glMatrixMode(GL11.GL_PROJECTION);
-            GL11.glLoadIdentity();
-            GL11.glOrtho(0, this.window.getFramebufferWidth() / 3, this.window.getFramebufferHeight() / 3, 0, 1000, 3000);
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glLoadIdentity();
-            GL11.glTranslatef(0, 0, -2000);
-
-            if (this.screen != null) this.screen.render(this.window.getFramebufferWidth() / 3, this.window.getFramebufferHeight() / 3, 0, 0);
-
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            this.textureManager.bind("skins.png");
-
-            if (this.connection != null && this.player != null) {
-                GL11.glPushMatrix();
-                GL11.glTranslatef(this.window.getFramebufferWidth() / 3 / 2 - this.player.x, this.window.getFramebufferHeight() / 3 / 2 - this.player.y, 0);
-
-
-                float[] color = new float[3];
-                int u = this.player.dir == 2 ? 3 * 16 : this.player.dir * 16;
-                int v = 0;
-                float u0 = (u) / 256.0f;
-                float v0 = v / 256.0f;
-                float u1 = (u + 16) / 256.0f;
-                float v1 = (v + 16) / 256.0f;
-
-                if (this.player.dir == 2) {
-                    float temp = u0;
-                    u0 = u1;
-                    u1 = temp;
-                }
-
-                GL11.glBegin(GL11.GL_QUADS);
-
-                Utils.unpackARGB(this.player.color, color);
-                GL11.glColor4f(color[0], color[1], color[2], 1.0f);
-
-                GL11.glTexCoord2f(u0, v0);
-                GL11.glVertex3f(this.player.x - 8, this.player.y - 8, 0);
-                GL11.glTexCoord2f(u0, v1);
-                GL11.glVertex3f(this.player.x - 8, this.player.y + 8, 0);
-                GL11.glTexCoord2f(u1, v1);
-                GL11.glVertex3f(this.player.x + 8, this.player.y + 8, 0);
-                GL11.glTexCoord2f(u1, v0);
-                GL11.glVertex3f(this.player.x + 8, this.player.y - 8, 0);
-
-                for (Player p : this.playerList.values()) {
-                    u = p.dir == 2 ? 3 * 16 : p.dir * 16;
-                    v = 0;
-                    u0 = (u) / 256.0f;
-                    v0 = v / 256.0f;
-                    u1 = (u + 16) / 256.0f;
-                    v1 = (v + 16) / 256.0f;
-
-                    if (p.dir == 2) {
-                        float temp = u0;
-                        u0 = u1;
-                        u1 = temp;
-                    }
-
-                    Utils.unpackARGB(p.color, color);
-                    GL11.glColor4f(color[0], color[1], color[2], 1.0f);
-
-                    GL11.glTexCoord2f(u0, v0);
-                    GL11.glVertex3f(p.x, p.y, 0);
-                    GL11.glTexCoord2f(u0, v1);
-                    GL11.glVertex3f(p.x, p.y + 16, 0);
-                    GL11.glTexCoord2f(u1, v1);
-                    GL11.glVertex3f(p.x + 16, p.y + 16, 0);
-                    GL11.glTexCoord2f(u1, v0);
-                    GL11.glVertex3f(p.x + 16, p.y, 0);
-                }
-
-                GL11.glEnd();
-                GL11.glDisable(GL11.GL_BLEND);
-                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                GL11.glPopMatrix();
-            }
-
+			this.renderer.render();
+			
             f.end();
 
-            GL11.glMatrixMode(GL11.GL_PROJECTION);
-            GL11.glLoadIdentity();
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glLoadIdentity();
+			Renderer.setMatrixMode(Renderer.MatrixMode.PROJECTION);
+            Renderer.loadMatrixIdentity();
+			Renderer.setMatrixMode(Renderer.MatrixMode.MODELVIEW);
+			Renderer.loadMatrixIdentity();
             f.draw(shader);
 
             if (this.showImGuiLayer) {
@@ -390,8 +319,9 @@ public class Client implements Window.WindowEventHandler {
 
             if (System.currentTimeMillis() - lastFCTime > 1000) {
                 lastFCTime = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(this.window.getHandle(), "Test Game - " + frameCounter + " FPS " + tickCounter +  " TK");
-                frameCounter = 0;
+                this.currentFps = frameCounter;
+                this.currentTicks = tickCounter;
+				frameCounter = 0;
                 tickCounter = 0;
             }
         }
@@ -403,11 +333,11 @@ public class Client implements Window.WindowEventHandler {
 
     public void disconnect() {
         if (this.connection != null) {
+			this.level = null;
             this.connection.disconnect();
             this.playerList.clear();
             this.player = null;
             if (this.integratedServer != null) this.integratedServer.close();
-//            if (this.integratedServer != null) this.connectionText.set("");
             this.connection = null;
             this.integratedServer = null;
             this.messages.clear();

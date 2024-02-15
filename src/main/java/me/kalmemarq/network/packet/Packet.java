@@ -12,7 +12,10 @@ public abstract class Packet {
             Map.entry(PosPacket.class, 0x5),
             Map.entry(RemovePlayerPacket.class, 0x6),
             Map.entry(WorldDataPacket.class, 0x7),
-            Map.entry(PlayPacket.class, 0x8)
+            Map.entry(PlayPacket.class, 0x8),
+            Map.entry(ReadyPlayPacket.class, 0x9),
+            Map.entry(ChunkDataPacket.class, 0xA),
+            Map.entry(LevelInfoPacket.class, 0xB)
     );
 
     public static Map<Integer, Class<? extends Packet>> ID_TO_CLASS = CLASS_TO_ID.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));

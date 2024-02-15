@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.kalmemarq.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
@@ -19,11 +18,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Shader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
     private int id;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
+	private final Map<String, Uniform> uniforms = new HashMap<>();
     private IntBuffer uniformIntBuffer;
     private FloatBuffer uniformFloatBuffer;
+	public Uniform projectMatUniform;
+	public Uniform modelViewMatUniform;
+	public Uniform colorUniform;
 
     public Shader(String name) {
         this.id = GL20.glCreateProgram();
@@ -34,7 +37,7 @@ public class Shader {
         var rp = DefaultResourcePack.get();
 
         try {
-            var source = Utils.readString(rp.get("shaders/" + name + ".vsh").get().get());
+            var source = Utils.readString(rp.getResource("assets/minicraft/shaders/" + name + ".vsh").get().inputSupplier().get());
             GL20.glShaderSource(verShader, source);
         } catch (IOException e) {
             LOGGER.info("Could not set vertex shader source", e);
@@ -45,7 +48,7 @@ public class Shader {
         }
 
         try {
-            var source = Utils.readString(rp.get("shaders/" + name + ".fsh").get().get());
+            var source = Utils.readString(rp.getResource("assets/minicraft/shaders/" + name + ".fsh").get().inputSupplier().get());
             GL20.glShaderSource(fragShader, source);
         } catch (IOException e) {
             LOGGER.info("Could not set fragment shader source", e);
@@ -86,19 +89,26 @@ public class Shader {
         this.uniformFloatBuffer = MemoryUtil.memAllocFloat(16);
 
         try {
-            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.get("shaders/" + name + ".json").get().get()), JsonObject.class);
+            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.getResource("assets/minicraft/shaders/" + name + ".json").get().inputSupplier().get()), JsonObject.class);
             JsonArray arr = obj.getAsJsonArray("uniforms");
 
             for (JsonElement itemel : arr) {
                 JsonObject itemobj = itemel.getAsJsonObject();
                 String uniName = itemobj.get("name").getAsString();
+                String uniType = itemobj.get("type").getAsString();
                 int location = GL30.glGetUniformLocation(this.id, uniName);
                 System.out.println(uniName + ";" + location);
                 this.uniformLocations.put(uniName, location);
+				
+				this.uniforms.put(uniName, new Uniform(uniName, location, Uniform.DataType.getById(uniType)));
             }
         } catch (IOException e) {
             LOGGER.info("Failed to load shader config", e);
         }
+		
+		this.projectMatUniform = this.uniforms.get("uProjectionMat");
+		this.modelViewMatUniform = this.uniforms.get("uModelViewMat");
+		this.colorUniform = this.uniforms.get("uColor");
     }
 
     public int getId() {
@@ -120,45 +130,13 @@ public class Shader {
         return location;
     }
 
-    public void setUniform(String name, int value) {
+    public void setSample(String name, int value) {
         GL20.glUniform1i(this.getUniformLocation(name), value);
     }
 
-    public void setUniform(String name, float value) {
-        GL20.glUniform1f(this.getUniformLocation(name), value);
-    }
-
-    public void setUniform(String name, int value0, int value1) {
-        GL20.glUniform2i(this.getUniformLocation(name), value0, value1);
-    }
-
-    public void setUniform(String name, float value0, float value1) {
-        GL20.glUniform2f(this.getUniformLocation(name), value0, value1);
-    }
-
-    public void setUniform(String name, int value0, int value1, int value2) {
-        GL20.glUniform3i(this.getUniformLocation(name), value0, value1, value2);
-    }
-
-    public void setUniform(String name, float value0, float value1, float value2) {
-        GL20.glUniform3f(this.getUniformLocation(name), value0, value1, value2);
-    }
-
-    public void setUniform(String name, int value0, int value1, int value2, int value3) {
-        GL20.glUniform4i(this.getUniformLocation(name), value0, value1, value2, value3);
-    }
-
-    public void setUniform(String name, float value0, float value1, float value2, float value3) {
-        GL20.glUniform4f(this.getUniformLocation(name), value0, value1, value2, value3);
-    }
-
-    public void setUniform(String name, Matrix4f value) {
-        this.uniformFloatBuffer.position(0);
-        value.get(this.uniformFloatBuffer);
-        this.uniformFloatBuffer.flip();
-    }
-
     public void close() {
+		this.uniforms.values().forEach(Uniform::close);
+		
         MemoryUtil.memFree(this.uniformIntBuffer);
         MemoryUtil.memFree(this.uniformFloatBuffer);
         GL20.glDeleteProgram(this.id);

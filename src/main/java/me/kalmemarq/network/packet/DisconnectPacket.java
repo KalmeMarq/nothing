@@ -20,7 +20,12 @@ public class DisconnectPacket extends Packet {
         this.reason = buffer.readString();
     }
 
-    public String getReason() {
+	@Override
+	public void apply(PacketListener listener) {
+		listener.onDisconnect(this);
+	}
+
+	public String getReason() {
         return this.reason;
     }
 }

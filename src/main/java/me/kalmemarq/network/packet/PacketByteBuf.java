@@ -12,9 +12,40 @@ public class PacketByteBuf {
         this.parent = buffer;
     }
 
+	/**
+	 * @see io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
+	 */
+	public static int getVarIntLength(int value) {
+		if ((value & (0xffffffff <<  7)) == 0) {
+			return 1;
+		}
+		if ((value & (0xffffffff << 14)) == 0) {
+			return 2;
+		}
+		if ((value & (0xffffffff << 21)) == 0) {
+			return 3;
+		}
+		if ((value & (0xffffffff << 28)) == 0) {
+			return 4;
+		}
+		return 5;
+	}
+	
+	public void ensureWritable(int minWritableBytes) {
+		this.parent.ensureWritable(minWritableBytes);
+	}
+	
+	public void release() {
+		this.parent.release();
+	}
+
     public void writeBytes(byte[] src) {
         this.parent.writeBytes(src);
     }
+
+	public void writeBytes(ByteBuf buf, int sourceIndex, int length) {
+		this.parent.writeBytes(buf, sourceIndex, length);
+	}
 
     public void readBytes(byte[] dst) {
         this.parent.readBytes(dst);

@@ -28,4 +28,8 @@ public class MouseHandler implements Window.MouseEventHandler {
     	this.x = x;
 		this.y = y;
 	}
+
+	@Override
+	public void onScroll(double x, double y) {
+	}
 }

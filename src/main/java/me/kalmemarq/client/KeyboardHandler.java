@@ -13,9 +13,17 @@ public class KeyboardHandler implements Window.KeyboardEventHandler {
 
     @Override
     public void onKey(int key, int scancode, int action, int mods) {
-        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F3) {
+        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F4) {
             this.client.showImGuiLayer = !this.client.showImGuiLayer;
         }
+
+		if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F3) {
+			this.client.showDebugHud = !this.client.showDebugHud;
+		}
+
+		if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F11) {
+			this.client.window.toggleFullscreen();
+		}
 
         if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_ESCAPE && this.client.connection != null && this.client.screen == null) {
             this.client.screen = new PauseScreen(this.client);

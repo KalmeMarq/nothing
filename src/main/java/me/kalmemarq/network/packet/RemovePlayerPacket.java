@@ -20,7 +20,12 @@ public class RemovePlayerPacket extends Packet {
         this.username = buffer.readString();
     }
 
-    public String getUsername() {
+	@Override
+	public void apply(PacketListener listener) {
+		listener.onRemovePlayer(this);
+	}
+
+	public String getUsername() {
         return this.username;
     }
 }

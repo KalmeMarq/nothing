@@ -37,6 +37,7 @@ public class Main {
             return;
         }
 
+		Thread.currentThread().setName("Main Thread");
         new Client(saveDirPath).run();
     }
 }

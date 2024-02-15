@@ -1,0 +1,26 @@
+{
+  "attributes": [
+    {
+      "name": "aPosition",
+      "type": "vec3"
+    },
+    {
+      "name": "aUV0",
+      "type": "vec2"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "uProjectionMat",
+      "type": "mat4"
+    },
+    {
+      "name": "uModelViewMat",
+      "type": "mat4"
+    },
+    {
+      "name": "uColor",
+      "type": "vec4"
+    }
+  ]
+}

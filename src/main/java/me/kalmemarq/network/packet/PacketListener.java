@@ -22,6 +22,15 @@ public interface PacketListener {
     default void onRequestPreviousMessages(RequestPreviousMessagesPacket packet) {
     }
 
-    default void onWorldDataPacket(WorldDataPacket packet) {
+    default void onWorldData(WorldDataPacket packet) {
     }
+
+	default void onReadyPlay(ReadyPlayPacket packet) {
+	}
+	
+	default void onChunkData(ChunkDataPacket packet) {
+	}
+	
+	default void onLevelInfo(LevelInfoPacket packet) {
+	}
 }

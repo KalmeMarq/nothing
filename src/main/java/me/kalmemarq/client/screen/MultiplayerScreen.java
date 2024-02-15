@@ -1,6 +1,5 @@
 package me.kalmemarq.client.screen;
 
-import me.kalmemarq.Utils;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.network.packet.LoginPacket;
 import me.kalmemarq.network.packet.Packet;
@@ -9,18 +8,21 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class MultiplayerScreen extends Screen {
+	private final Screen parentScreen;
+	
     private int selectedIndex;
     private String ip = "";
     private String port = "";
 
-    public MultiplayerScreen(Client client) {
+    public MultiplayerScreen(Client client, Screen parentScreen) {
         super(client);
+		this.parentScreen = parentScreen;
     }
 
     @Override
     public void keyPressed(int key, int mods) {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
-            this.client.screen = new TitleScreen(this.client);
+            this.client.screen = this.parentScreen;
             return;
         }
 
@@ -32,11 +34,11 @@ public class MultiplayerScreen extends Screen {
         }
 
         if (key == GLFW.GLFW_KEY_BACKSPACE) {
-            if (this.selectedIndex == 0 && this.ip.length() > 0) {
+            if (this.selectedIndex == 0 && !this.ip.isEmpty()) {
                 this.ip = this.ip.substring(0, this.ip.length() - 1);
             }
 
-            if (this.selectedIndex == 1 && this.port.length() > 0) {
+            if (this.selectedIndex == 1 && !this.port.isEmpty()) {
                 this.port = this.port.substring(0, this.port.length() - 1);
             }
         }
@@ -44,8 +46,8 @@ public class MultiplayerScreen extends Screen {
         if (key == GLFW.GLFW_KEY_ENTER) {
             if (this.selectedIndex == 2) {
                 if (this.client.connect(this.ip, Integer.parseInt(this.port))) {
-                    this.client.connection.sendPackets(new Packet[] {new LoginPacket(this.client.settings.username, 0xFF_FFFFFF), new RequestPreviousMessagesPacket()});
-                    this.client.screen = null;
+                    this.client.connection.sendPacket(new LoginPacket(this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
+                    this.client.screen = new LoadingScreen(this.client, false);
                 }
             }
         }
@@ -62,20 +64,11 @@ public class MultiplayerScreen extends Screen {
 
     @Override
     public void render(int screenWidth, int screenHeight, int mouseX, int mouseY) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glVertex3f(0, 0, 0);
-        GL11.glVertex3f(0, screenHeight, 0);
-        GL11.glVertex3f(screenWidth, screenHeight, 0);
-        GL11.glVertex3f(screenWidth, 0, 0);
-        GL11.glEnd();
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+		super.render(screenWidth, screenHeight, mouseX, mouseY);
 
         this.font.drawText("Server IP: " + this.ip, 20, 30, this.selectedIndex == 0 ? 0xFFFFFF : 0x909090);
         this.font.drawText("Server Port: " + this.port, 20, 44, this.selectedIndex == 1 ? 0xFFFFFF : 0x909090);
 
-        this.font.drawText("Connect to Server", 20, 72, this.selectedIndex == 2 && this.ip.length() > 0 && this.port.length() > 0 ? 0xFFFFFF : 0x909090);
+        this.font.drawText("Connect to Server", 20, 72, this.selectedIndex == 2 && !this.ip.isEmpty() && !this.port.isEmpty() ? 0xFFFFFF : 0x909090);
     }
 }

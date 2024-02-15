@@ -36,7 +36,12 @@ public class PosPacket extends Packet {
         this.dir = buffer.readInt();
     }
 
-    public String getUsername() {
+	@Override
+	public void apply(PacketListener listener) {
+		listener.onPos(this);
+	}
+
+	public String getUsername() {
         return this.username;
     }
 

@@ -1,0 +1,14 @@
+{
+  "minicraft:boss_death": {
+    "path": "bossdeath.ogg"
+  },
+  "minicraft:confirm": {
+    "path": "confirm.ogg"
+  },
+  "minicraft:craft": {
+    "path": "craft.ogg"
+  },
+  "minicraft:death": {
+    "path": "death.ogg"
+  }
+}

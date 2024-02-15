@@ -1,5 +1,6 @@
 package me.kalmemarq.client.screen;
 
+import me.kalmemarq.Identifier;
 import me.kalmemarq.client.Client;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +34,7 @@ public class PauseScreen extends Screen {
     }
 
     private void renderFrame(int x, int y, int width, int height) {
-        this.client.textureManager.bind("hud.png");
+        this.client.textureManager.bind(Identifier.of("minicraft:textures/hud.png"));
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2f(0, 0);
         GL11.glVertex3f(x, y, 0);

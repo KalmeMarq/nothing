@@ -1,10 +1,9 @@
 package me.kalmemarq.client.render;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.kalmemarq.Identifier;
 import me.kalmemarq.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
 import me.kalmemarq.client.texture.TextureManager;
@@ -15,18 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Font {
-
-    private TextureManager textureManager;
-    private Map<Character, Glyph> glyphMap = new HashMap<>();
+    private final TextureManager textureManager;
+    private final Map<Character, Glyph> glyphMap = new HashMap<>();
+	private boolean italic = false;
 
     public Font(TextureManager textureManager) {
         this.textureManager = textureManager;
     }
 
-    public void load() {
+	public void setItalic(boolean italic) {
+		this.italic = italic;
+	}
+	
+	public void load() {
         var rp = DefaultResourcePack.get();
         try {
-            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.get("font.json").get().get()), JsonObject.class);
+            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.getResource("assets/minicraft/fonts/font.json").get().inputSupplier().get()), JsonObject.class);
             JsonArray arr = obj.getAsJsonArray("chars");
 
             int r = 0;
@@ -51,42 +54,91 @@ public class Font {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        for (Map.Entry<Character, Glyph> glyph : this.glyphMap.entrySet()) {
-//            Glyph info = glyph.getValue();
-//            System.out.println(glyph.getKey() + " {u0=" + info.u0 + ",v0=" + info.v0 + ",u1=" + info.u1 + ",v1=" + info.v1 + "}");
-//        }
     }
 
-    public void drawText(String text, int x, int y, int color) {
+	public void drawText(String text, int x, int y, int color) {
+		this.drawTextInternal(text, x, y, color, false, 0);
+	}
+
+	public void drawTextOutlined(String text, int x, int y, int color, int outlineColor) {
+		this.drawTextInternal(text, x, y, color, true, outlineColor);
+	}
+	
+    private void drawTextInternal(String text, int x, int y, int color, boolean hasOutline, int outlineColor) {
         if (text == null || text.isEmpty()) return;
 
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        this.textureManager.bind("font.png");
+        this.textureManager.bind(Identifier.of("minicraft:textures/font.png"));
         GL11.glBegin(GL11.GL_QUADS);
 
         char[] charr = text.toCharArray();
         float[] colorarr = new float[3];
-        Utils.unpackARGB(color, colorarr);
-        GL11.glColor4f(colorarr[0], colorarr[1], colorarr[2], 1.0f);
+        float[] outcolorarr = new float[3];
+        
+		Utils.unpackARGB(color, colorarr);
+		Utils.unpackARGB(outlineColor, outcolorarr);
+		
         int xx = x;
-        for (int i = 0; i < charr.length; ++i) {
-            char c = charr[i];
-
+        for (char c : charr) {
             if (!Character.isWhitespace(c)) {
                 Glyph g = this.glyphMap.get(c);
 
                 if (g != null) {
+                    if (hasOutline) {
+                        GL11.glColor4f(outcolorarr[0], outcolorarr[1], outcolorarr[2], 1.0f);
+
+                        // Top
+                        GL11.glTexCoord2f(g.u0, g.v0);
+                        GL11.glVertex3f(xx + (this.italic ? 4f : 0), y - 3 - 1, 0);
+                        GL11.glTexCoord2f(g.u0, g.v1);
+                        GL11.glVertex3f(xx, y + 12 - 3 - 1, 0);
+                        GL11.glTexCoord2f(g.u1, g.v1);
+                        GL11.glVertex3f(xx + 8, y + 12 - 3 - 1, 0);
+                        GL11.glTexCoord2f(g.u1, g.v0);
+                        GL11.glVertex3f(xx + 8 + (this.italic ? 4f : 0), y - 3 - 1, 0);
+
+                        // Left
+                        GL11.glTexCoord2f(g.u0, g.v0);
+                        GL11.glVertex3f(xx - 1 + (this.italic ? 4f : 0), y - 3, 0);
+                        GL11.glTexCoord2f(g.u0, g.v1);
+                        GL11.glVertex3f(xx - 1, y + 12 - 3, 0);
+                        GL11.glTexCoord2f(g.u1, g.v1);
+                        GL11.glVertex3f(xx + 8 - 1, y + 12 - 3, 0);
+                        GL11.glTexCoord2f(g.u1, g.v0);
+                        GL11.glVertex3f(xx + 8 - 1 + (this.italic ? 4f : 0), y - 3, 0);
+
+                        // Right
+                        GL11.glTexCoord2f(g.u0, g.v0);
+                        GL11.glVertex3f(xx + 1 + (this.italic ? 4f : 0), y - 3, 0);
+                        GL11.glTexCoord2f(g.u0, g.v1);
+                        GL11.glVertex3f(xx + 1, y + 12 - 3, 0);
+                        GL11.glTexCoord2f(g.u1, g.v1);
+                        GL11.glVertex3f(xx + 8 + 1, y + 12 - 3, 0);
+                        GL11.glTexCoord2f(g.u1, g.v0);
+                        GL11.glVertex3f(xx + 8 + 1 + (this.italic ? 4f : 0), y - 3, 0);
+
+                        // Bottom
+                        GL11.glTexCoord2f(g.u0, g.v0);
+                        GL11.glVertex3f(xx + (this.italic ? 4f : 0), y - 3 + 1, 0);
+                        GL11.glTexCoord2f(g.u0, g.v1);
+                        GL11.glVertex3f(xx, y + 12 - 3 + 1, 0);
+                        GL11.glTexCoord2f(g.u1, g.v1);
+                        GL11.glVertex3f(xx + 8, y + 12 - 3 + 1, 0);
+                        GL11.glTexCoord2f(g.u1, g.v0);
+                        GL11.glVertex3f(xx + 8 + (this.italic ? 4f : 0), y - 3 + 1, 0);
+                    }
+
+                    GL11.glColor4f(colorarr[0], colorarr[1], colorarr[2], 1.0f);
 
                     GL11.glTexCoord2f(g.u0, g.v0);
-                    GL11.glVertex3f(xx, y - 3, 0);
+                    GL11.glVertex3f(xx + (this.italic ? 4f : 0), y - 3, 0);
                     GL11.glTexCoord2f(g.u0, g.v1);
                     GL11.glVertex3f(xx, y + 12 - 3, 0);
                     GL11.glTexCoord2f(g.u1, g.v1);
                     GL11.glVertex3f(xx + 8, y + 12 - 3, 0);
                     GL11.glTexCoord2f(g.u1, g.v0);
-                    GL11.glVertex3f(xx + 8, y - 3, 0);
+                    GL11.glVertex3f(xx + 8 + (this.italic ? 4f : 0), y - 3, 0);
                 }
             }
 

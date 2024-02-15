@@ -8,6 +8,7 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
+import me.kalmemarq.Identifier;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.screen.TitleScreen;
 import me.kalmemarq.client.texture.Texture;
@@ -26,6 +27,7 @@ public class ImGuiLayer {
     private ImBoolean showSoundsWindow = new ImBoolean(false);
     private ImBoolean showAboutWindow = new ImBoolean(false);
     private ImBoolean showMessagesWindow = new ImBoolean(false);
+    private ImBoolean showGameInfoWindow = new ImBoolean(false);
     private ImString messageInput = new ImString();
 
     public ImGuiLayer(Client client) {
@@ -82,7 +84,11 @@ public class ImGuiLayer {
             }
 
             if (ImGui.beginMenu("Game")) {
-                if (ImGui.menuItem("Open Title")) {
+                if (ImGui.menuItem("Info")) {
+					this.showGameInfoWindow.set(true);
+                }
+				
+				if (ImGui.menuItem("Open Title")) {
                     this.client.screen = new TitleScreen(this.client);
                 }
 
@@ -94,6 +100,10 @@ public class ImGuiLayer {
                     ImGui.text("Player X: " + this.client.player.x);
                     ImGui.text("Player Y: " + this.client.player.y);
                 }
+				
+				if (this.client.screen != null) {
+					ImGui.text("Screen: " + this.client.screen.getClass().getSimpleName());
+				}
 
                 ImGui.endMenu();
             }
@@ -139,13 +149,13 @@ public class ImGuiLayer {
 
             if (this.showTexturesWindow.get()) {
                 if (ImGui.begin("Textures", this.showTexturesWindow)) {
-                    for (Map.Entry<String, Texture> entry : this.client.textureManager.getTextures().entrySet()) {
+                    for (Map.Entry<Identifier, Texture> entry : this.client.textureManager.getTextures().entrySet()) {
                         Texture txr = entry.getValue();
                         ImGui.image(txr.getId(), txr.getWidth(), txr.getHeight());
 
                         if (ImGui.isItemHovered()) {
                             ImGui.beginTooltip();
-                            ImGui.text(entry.getKey());
+                            ImGui.text(entry.getKey().toString());
                             ImGui.endTooltip();
                         }
                     }
@@ -155,6 +165,16 @@ public class ImGuiLayer {
 
             if (this.showSoundsWindow.get()) {
                 if (ImGui.begin("Sounds", this.showSoundsWindow)) {
+					ImGui.text("Current Device: " + this.client.getSoundManager().getCurrentDevice().substring(15));
+					
+					ImGui.text("Devices available:");
+					for (String device : this.client.getSoundManager().getAllDevicesAvailable()) {
+						ImGui.text(device.substring(15));
+					}
+					
+					for (Map.Entry<Identifier, Integer> entry : this.client.getSoundManager().getBuffers().entrySet()) {
+						ImGui.text(entry.getKey() + ": " + entry.getValue());
+					}
                 }
                 ImGui.end();
             }
@@ -171,6 +191,16 @@ public class ImGuiLayer {
                 ImGui.end();
             }
 
+			if (this.showGameInfoWindow.get()) {
+				if (ImGui.begin("Game Info", this.showGameInfoWindow)) {
+					ImGui.text("Window Size: " + this.client.window.getWidth() + "x" + this.client.window.getHeight());
+					ImGui.text("Window Framebuffer Size: " + this.client.window.getFramebufferWidth() + "x" + this.client.window.getFramebufferHeight());
+					ImGui.text("FPS: " + this.client.currentFps);
+					ImGui.text("TKS: " + this.client.currentTicks);
+				}
+				ImGui.end();
+			}
+			
             ImGui.popStyleColor();
         }
         ImGui.endMainMenuBar();

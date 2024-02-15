@@ -15,10 +15,22 @@ public final class Utils {
     private Utils() {
     }
 
+	/**
+	 * Clamps the given value between the lower and upper bound
+	 * @param value value to clamp
+	 * @param min lower bound
+	 * @param max upper bound
+	 * @return clamped value
+	 */
     public static int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));
     }
 
+	/**
+	 * Read an {@link InputStream} as a string
+	 * @param inputStream inputStream to read
+	 * @return the string content of the {@link InputStream}
+	 */
     public static String readString(InputStream inputStream) {
         StringBuilder builder = new StringBuilder();
 

@@ -36,7 +36,12 @@ public class PlayPacket extends Packet {
         this.dir = buffer.readByte();
     }
 
-    public String getUsername() {
+	@Override
+	public void apply(PacketListener listener) {
+		listener.onPlay(this);
+	}
+
+	public String getUsername() {
         return this.username;
     }
 

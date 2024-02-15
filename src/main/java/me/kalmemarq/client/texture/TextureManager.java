@@ -1,19 +1,21 @@
 package me.kalmemarq.client.texture;
 
+import me.kalmemarq.Identifier;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class TextureManager {
-    private final Map<String, Texture> textureMap = new HashMap<>();
+    private final Map<Identifier, Texture> textureMap = new HashMap<>();
 
     public TextureManager() {
     }
 
-    public Map<String, Texture> getTextures() {
+    public Map<Identifier, Texture> getTextures() {
         return this.textureMap;
     }
 
-    public void load(String texture) {
+    public void load(Identifier texture) {
         Texture txr = new Texture(texture);
         txr.load();
         this.textureMap.put(texture, txr);
@@ -23,7 +25,7 @@ public class TextureManager {
         return this.textureMap.get(texture).getId();
     }
 
-    public void bind(String path) {
+    public void bind(Identifier path) {
         Texture texture = this.textureMap.get(path);
         if (texture == null) {
             texture = new Texture(path);
@@ -36,7 +38,7 @@ public class TextureManager {
 
     public void close() {
         this.textureMap.values().forEach(t -> {
-            System.out.println("Texture " + t.getPath() + " has been freed");
+            System.out.println("Texture " + t.getIdentifier() + " has been freed");
             t.close();
         });
         this.textureMap.clear();

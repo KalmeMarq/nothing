@@ -11,7 +11,7 @@ public class RequestPreviousMessagesPacket extends Packet {
     @Override
     public void read(PacketByteBuf buffer) {
     }
-
+	
     @Override
     public void apply(PacketListener listener) {
         listener.onRequestPreviousMessages(this);

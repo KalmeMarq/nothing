@@ -80,9 +80,8 @@ public class Framebuffer {
     }
 
     public void resize(int width, int height) {
-    	this.width = width;
-		this.height = height;
-		System.out.println("Resized: " + width + "x" + height);
+    	this.width = Math.max(width, 1);
+		this.height = Math.max(height, 1);
 
 		GL11.glDeleteTextures(this.txr);
 		GL30.glDeleteRenderbuffers(this.rbo);
@@ -95,13 +94,13 @@ public class Framebuffer {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.txr);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, width, height, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, 0L);
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, this.width, this.height, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, 0L);
 
 		GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.txr, 0);
 
 		this.rbo = GL30.glGenRenderbuffers();
 		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, this.rbo);
-		GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, width, height);
+		GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, this.width, this.height);
 
 		GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, this.rbo);
 
@@ -114,8 +113,10 @@ public class Framebuffer {
 	}
 
     public void begin(int width, int height) {
-		if (this.width != width || this.height != height) {
+		if (width != 0 && height != 0) {
+			if (this.width != width || this.height != height) {
 			this.resize(width, height);
+			}
 		}
 		
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fbo);
@@ -137,8 +138,9 @@ public class Framebuffer {
 		GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.vbo);
 		GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.ibo);
 		
-        shader.setUniform("Sampler0", 0);
-        shader.setUniform("uColor", 1.0f, 1.0f, 1.0f, 1.0f);
+        shader.setSample("Sampler0", 0);
+        shader.colorUniform.set(1.0f, 1.0f, 1.0f, 1.0f);
+		shader.colorUniform.upload();
 
 		VertexFormat.POSITION_TEXTURE.enable();
 		
