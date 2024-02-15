@@ -3,9 +3,8 @@ package me.kalmemarq.client.render;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import java.nio.ByteBuffer;
-
 public class VertexBuffer {
+	private boolean disposed;
 	private int vao;
 	private int vbo;
 	private int ibo;
@@ -27,10 +26,15 @@ public class VertexBuffer {
 	public void bind() {
 		GL30.glBindVertexArray(this.vao);
 	}
-	
+
+	public boolean isDisposed() {
+		return this.disposed;
+	}
+
 	public void close() {
 		GL30.glDeleteVertexArrays(this.vao);
 		GL30.glDeleteBuffers(this.vbo);
 		GL30.glDeleteBuffers(this.ibo);
+		this.disposed = true;
 	}
 }

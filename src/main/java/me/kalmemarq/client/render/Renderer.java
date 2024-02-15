@@ -41,6 +41,7 @@ public class Renderer {
 	}
 	
 	public void tick() {
+        this.vertexBuffers.removeIf(VertexBuffer::isDisposed);
         this.bufferBuilders.removeIf(BufferBuilder::isDisposed);
 	}
 	

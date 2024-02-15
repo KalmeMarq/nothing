@@ -1,5 +1,9 @@
 package me.kalmemarq.common.world;
 
+import me.kalmemarq.common.entity.Entity;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Level {
@@ -10,6 +14,7 @@ public class Level {
 	public int xChunks;
 	public int yChunks;
 	public final Chunk[] chunks;
+	public List<Entity> entities = new ArrayList<>();
 	
 	public Level(int width, int height) {
 		this.width = width;
@@ -17,6 +22,22 @@ public class Level {
 		this.xChunks = this.width / 8;
 		this.yChunks = this.height / 8;
 		this.chunks = new Chunk[this.xChunks * this.yChunks];
+	}
+	
+	public void tick() {
+		for (Entity entity : this.entities) {
+			entity.tick();
+		}
+	}
+	
+	public void addEntity(Entity entity) {
+		entity.setLevel(this);
+		this.entities.add(entity);
+	}
+
+	public void removeEntity(Entity entity) {
+		entity.setLevel(null);
+		this.entities.remove(entity);
 	}
 	
 	public void generate() {

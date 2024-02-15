@@ -196,47 +196,12 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
             this.connection.sendPacket(new PosPacket(this.settings.username, this.player.x, this.player.y, 0, this.player.dir));
         }
 
-        if (this.player != null && this.level != null) {
-            this.player.prevX = this.player.x;
-            this.player.prevY = this.player.y;
-
-            float xa = 0;
-            float ya = 0;
-
-            if (GLFW.glfwGetKey(this.window.getHandle(), GLFW.GLFW_KEY_W) != GLFW.GLFW_RELEASE) {
-                ya -= 1;
-            }
-
-            if (GLFW.glfwGetKey(this.window.getHandle(), GLFW.GLFW_KEY_S) != GLFW.GLFW_RELEASE) {
-                ya += 1;
-            }
-
-            if (GLFW.glfwGetKey(this.window.getHandle(), GLFW.GLFW_KEY_D) != GLFW.GLFW_RELEASE) {
-                xa += 1;
-            }
-
-            if (GLFW.glfwGetKey(this.window.getHandle(), GLFW.GLFW_KEY_A) != GLFW.GLFW_RELEASE) {
-                xa -= 1;
-            }
-
-            if (xa < 0) this.player.dir = 2;
-            if (xa > 0) this.player.dir = 3;
-            if (ya < 0) this.player.dir = 1;
-            if (ya > 0) this.player.dir = 0;
-
-			int xx = (int) ((this.player.x + (xa > 0 ? 6 : -6) + xa) / 16);
-			int yy = (int) ((this.player.y + (ya > 0 ? 6 : -6) + ya) / 16);
+        if (this.level != null) {
+			this.level.tick();
 			
-			int tilea = this.level.getTileId(xx, yy);
-			Tile tile = Tiles.REGISTRY.getValueByRawId(tilea);
-			
-			if (tile != null && tile.isSolid()) {
-				xa = 0.0f;
-				ya = 0.0f;
+			if (this.player != null) {
+				this.player.tickClient(this);
 			}
-			
-            this.player.x += xa * 1f;
-            this.player.y += ya * 1f;
         }
 
         if (this.connection != null) this.connection.tick();

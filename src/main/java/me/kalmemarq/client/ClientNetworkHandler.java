@@ -82,6 +82,8 @@ class ClientNetworkHandler implements PacketListener {
 	@Override
 	public void onReadyPlay(ReadyPlayPacket packet) {
 		this.client.level = this.storageLevel;
+		this.client.player.setLevel(this.storageLevel);
+		this.storageLevel = null;
 		this.client.screen = null;
 	}
 }
