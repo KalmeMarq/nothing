@@ -1,8 +1,7 @@
 package me.kalmemarq.client.render;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.kalmemarq.common.Identifier;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
@@ -29,14 +28,14 @@ public class Font {
 	public void load() {
         var rp = DefaultResourcePack.get();
         try {
-            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.getResource("assets/minicraft/fonts/font.json").get().inputSupplier().get()), JsonObject.class);
-            JsonArray arr = obj.getAsJsonArray("chars");
+            ObjectNode obj = Utils.OBJECT_MAPPER.readValue(Utils.readString(rp.getResource("assets/minicraft/fonts/font.json").get().inputSupplier().get()), ObjectNode.class);
+            JsonNode arr = obj.get("chars");
 
             int r = 0;
-            for (JsonElement line : arr) {
+            for (JsonNode line : arr) {
                 int c = 0;
 
-                for (char ch : line.getAsString().toCharArray()) {
+                for (char ch : line.textValue().toCharArray()) {
                     if (ch != '\u0000')
                         this.glyphMap.put(ch, new Glyph(
                                 (c * 8) / 128.0f,

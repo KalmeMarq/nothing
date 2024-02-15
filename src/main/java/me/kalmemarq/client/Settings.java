@@ -1,6 +1,6 @@
 package me.kalmemarq.client;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.common.logging.LogManager;
 import me.kalmemarq.common.logging.Logger;
@@ -29,26 +29,26 @@ public class Settings {
         }
 		
         try {
-			JsonObject obj = Utils.GSON.fromJson(Files.readString(this.optionsPath), JsonObject.class);
+			var obj = Utils.OBJECT_MAPPER.readValue(Files.readString(this.optionsPath), ObjectNode.class);
             
 			if (obj.has("username")) {
-				this.username = obj.get("username").getAsString();
+				this.username = obj.get("username").textValue();
 			}
 
 			if (obj.has("playerColorR")) {
-				this.playerColorR = obj.get("playerColorR").getAsInt();
+				this.playerColorR = obj.get("playerColorR").asInt(255);
 			}
 
 			if (obj.has("playerColorG")) {
-				this.playerColorG = obj.get("playerColorG").getAsInt();
+				this.playerColorG = obj.get("playerColorG").asInt(255);
 			}
 
 			if (obj.has("playerColorB")) {
-				this.playerColorB = obj.get("playerColorB").getAsInt();
+				this.playerColorB = obj.get("playerColorB").asInt(255);
 			}
 
 			if (obj.has("soundVolume")) {
-				this.soundVolume = obj.get("soundVolume").getAsInt();
+				this.soundVolume = obj.get("soundVolume").asInt(255);
 			}
 		} catch (IOException e) {
 			LOGGER.warn("Failed to load settings from disk", e);
@@ -56,16 +56,16 @@ public class Settings {
     }
 
     public void save() {
-        JsonObject obj = new JsonObject();
-		obj.addProperty("version", 1);
-		obj.addProperty("username", this.username);
-		obj.addProperty("playerColorR", this.playerColorR);
-		obj.addProperty("playerColorG", this.playerColorG);
-		obj.addProperty("playerColorB", this.playerColorB);
-		obj.addProperty("soundVolume", this.soundVolume);
+        ObjectNode obj = Utils.OBJECT_MAPPER.createObjectNode();
+		obj.put("version", 1);
+		obj.put("username", this.username);
+		obj.put("playerColorR", this.playerColorR);
+		obj.put("playerColorG", this.playerColorG);
+		obj.put("playerColorB", this.playerColorB);
+		obj.put("soundVolume", this.soundVolume);
 
         try {
-            Files.writeString(this.optionsPath, Utils.GSON.toJson(obj));
+            Files.writeString(this.optionsPath, obj.toPrettyString());
         } catch (IOException e) {
 			LOGGER.warn("Failed to save settings to disk", e);
         }

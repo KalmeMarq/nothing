@@ -1,8 +1,7 @@
 package me.kalmemarq.client.render;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.resource.DefaultResourcePack;
 import me.kalmemarq.common.logging.LogManager;
@@ -89,13 +88,13 @@ public class Shader {
         this.uniformFloatBuffer = MemoryUtil.memAllocFloat(16);
 
         try {
-            JsonObject obj = Utils.GSON.fromJson(Utils.readString(rp.getResource("assets/minicraft/shaders/" + name + ".json").get().inputSupplier().get()), JsonObject.class);
-            JsonArray arr = obj.getAsJsonArray("uniforms");
+            var obj = Utils.OBJECT_MAPPER.readValue(Utils.readString(rp.getResource("assets/minicraft/shaders/" + name + ".json").get().inputSupplier().get()), ObjectNode.class);
+            var arr = obj.get("uniforms");
 
-            for (JsonElement itemel : arr) {
-                JsonObject itemobj = itemel.getAsJsonObject();
-                String uniName = itemobj.get("name").getAsString();
-                String uniType = itemobj.get("type").getAsString();
+            for (JsonNode itemel : arr) {
+                ObjectNode itemobj = (ObjectNode) itemel;
+                String uniName = itemobj.get("name").textValue();
+                String uniType = itemobj.get("type").textValue();
                 int location = GL30.glGetUniformLocation(this.id, uniName);
                 System.out.println(uniName + ";" + location);
                 this.uniformLocations.put(uniName, location);
