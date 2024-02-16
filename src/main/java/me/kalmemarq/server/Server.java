@@ -24,6 +24,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Server extends ThreadExecutor {
+	public static final int PROTOCOL_VERSION = 1;
+
     public final Deque<NetworkConnection> connections = new ConcurrentLinkedDeque<>();
     protected final AtomicBoolean running = new AtomicBoolean(false);
     public final List<ChatMessage> messages = new ArrayList<>();

@@ -27,14 +27,14 @@ import java.util.Map;
 
 public class SoundManager {
     private boolean initialized;
-	private Client client;
+	private final Client client;
     private long device = -1;
     private ALCCapabilities deviceCaps;
     private long context;
     private ALCapabilities caps;
-    private Map<Identifier, Integer> buffers = new HashMap<>();
-    private List<SoundSource> sources = new ArrayList<>();
-	private SoundListener soundListener = new SoundListener();
+    private final Map<Identifier, Integer> buffers = new HashMap<>();
+    private final List<SoundSource> sources = new ArrayList<>();
+	private final SoundListener soundListener = new SoundListener();
 	
 	public SoundManager(Client client) {
 		this.client = client;
@@ -51,7 +51,11 @@ public class SoundManager {
 
         this.initialized = true;
     }
-	
+
+	public SoundListener getListener() {
+		return this.soundListener;
+	}
+
 	public String getCurrentDevice() {
 		return ALC10.alcGetString(this.device, ALC11.ALC_ALL_DEVICES_SPECIFIER);
 	}

@@ -6,6 +6,7 @@ import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
@@ -34,6 +35,7 @@ public class Window implements AutoCloseable {
     private KeyboardEventHandler keyboardEventHandler;
 	private boolean fullscreen;
 	private boolean currentFullscreen;
+	private GLCapabilities capabilities;
 
     public Window(int width, int height, String title) {
         if (!GLFW.glfwInit()) {
@@ -73,7 +75,7 @@ public class Window implements AutoCloseable {
 			if (this.windowEventHandler != null) this.windowEventHandler.onResize();
 		});
 
-        GL.createCapabilities();
+        this.capabilities = GL.createCapabilities();
 
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer wP = stack.mallocInt(1);
@@ -176,7 +178,11 @@ public class Window implements AutoCloseable {
     public void setMouseEventHandler(MouseEventHandler mouseEventHandler) {
         this.mouseEventHandler = mouseEventHandler;
     }
-	
+
+	public GLCapabilities getCapabilities() {
+		return this.capabilities;
+	}
+
 	public void toggleFullscreen() {
 		this.fullscreen = !this.fullscreen;
 	}

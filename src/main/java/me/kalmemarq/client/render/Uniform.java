@@ -18,14 +18,21 @@ public class Uniform {
 		this.name = name;
 		this.location = location;
 		this.type = type;
-		Shader.LOGGER.info("Name: {} Loc: {} Type: {} Size: {}", name, location, type.id, type.size);
 		if (type.isFloat) {
 			this.floatBuffer = MemoryUtil.memAllocFloat(type.size);
 		} else {
 			this.intBuffer = MemoryUtil.memAllocInt(type.size);
 		}
 	}
-	
+
+	public String getName() {
+		return this.name;
+	}
+
+	public int getLocation() {
+		return this.location;
+	}
+
 	public void upload() {
 		if (this.type.isFloat) {
 			this.floatBuffer.flip();

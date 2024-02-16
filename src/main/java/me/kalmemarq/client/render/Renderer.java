@@ -11,20 +11,44 @@ import me.kalmemarq.common.tile.Tile;
 import me.kalmemarq.common.tile.Tiles;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLCapabilities;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Renderer {
+	private static Renderer instance;
 	protected static final Logger LOGGER = LogManager.getLogger(Renderer.class);
 	private final Client client;
 	private List<VertexBuffer> vertexBuffers = new ArrayList<>();
 	private List<BufferBuilder> bufferBuilders = new ArrayList<>();
 	private Matrix4f projectionMatrix = new Matrix4f();
 	private Matrix4f modelViewMatrix = new Matrix4f();
+	private GLCapabilities capabilities;
 
 	public Renderer(Client client) {
+		instance = this;
 		this.client = client;
+	}
+
+	public GLCapabilities getCapabilities() {
+		return this.capabilities;
+	}
+
+	public List<VertexBuffer> getVertexBuffers() {
+		return this.vertexBuffers;
+	}
+
+	public List<BufferBuilder> getBufferBuilders() {
+		return this.bufferBuilders;
+	}
+
+	public static Renderer getInstance() {
+		return instance;
+	}
+
+	public void setCapabilities(GLCapabilities capabilities) {
+		this.capabilities = capabilities;
 	}
 
 	public VertexBuffer createVertexBuffer() {
@@ -42,6 +66,11 @@ public class Renderer {
 	public void tick() {
         this.vertexBuffers.removeIf(VertexBuffer::isDisposed);
         this.bufferBuilders.removeIf(BufferBuilder::isDisposed);
+	}
+	
+	public void dispose() {
+		this.vertexBuffers.forEach(VertexBuffer::close);
+		this.bufferBuilders.forEach(BufferBuilder::dispose);
 	}
 	
 	public void render() {
@@ -177,9 +206,14 @@ public class Renderer {
 			enableBlend();
 			setDefaultBlendFunc();
 			this.client.textureManager.bind(Identifier.of("minicraft:textures/hud.png"));
-			for (int i = 0; i < 10; ++i) {
-				renderTexture(i * 8, this.client.window.getFramebufferHeight() / 3 - 16, 0, 8, 8, 0, 0, 8, 8, 88, 56, false, false);
-				renderTexture(i * 8, this.client.window.getFramebufferHeight() / 3 - 8, 0, 8, 8, 8, 0, 8, 8, 88, 56, false, false);
+			for (int i = 0; i < this.client.player.maxHealth; ++i) {
+				renderTexture(i * 8, this.client.window.getFramebufferHeight() / 3 - 16, 0, 8, 8, 0, this.client.player.health <= i ? 8 : 0, 8, 8, 88, 56, false, false);
+			}
+			for (int i = 0; i < this.client.player.maxStamina; ++i) {
+				renderTexture(i * 8, this.client.window.getFramebufferHeight() / 3 - 8, 0, 8, 8, 8, this.client.player.stamina <= i ? 8 : 0, 8, 8, 88, 56, false, false);
+			}
+			for (int i = this.client.player.maxHunger - 1; i >= 0; --i) {
+				renderTexture(this.client.window.getFramebufferWidth() / 3 - i * 8 - 8, this.client.window.getFramebufferHeight() / 3 - 8, 0, 8, 8, 16, this.client.player.hunger <= i ? 8 : 0, 8, 8, 88, 56, false, false);
 			}
 			disableBlend();
 

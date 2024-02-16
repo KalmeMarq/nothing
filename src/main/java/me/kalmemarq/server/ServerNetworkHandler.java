@@ -32,11 +32,16 @@ public class ServerNetworkHandler implements PacketListener {
 	@Override
 	public void onLogin(LoginPacket packet) {
 		System.out.println("Bruv" + Thread.currentThread());
-		if (true && this.server.playerManager.alreadyLogged(packet.getUsername())) {
+		if (this.server.playerManager.alreadyLogged(packet.getUsername())) {
 			this.connection.sendPacket(new DisconnectPacket("Duplicated login"));
 			return;
 		}
-
+		
+		if (packet.getProtocolVersion() != Server.PROTOCOL_VERSION) {
+			this.connection.sendPacket(new DisconnectPacket("Client is not compatible"));
+			return;
+		}
+		
 		this.server.printMessage(packet.getUsername() + " logged in");
 
 		PlayerEntity p = this.server.playerManager.loadPlayer(packet.getUsername(), packet.getColor());

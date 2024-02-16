@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class Shader {
     protected static final Logger LOGGER = LogManager.getLogger(Shader.class);
-    private int id;
+    private final int id;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
 	private final Map<String, Uniform> uniforms = new HashMap<>();
     private IntBuffer uniformIntBuffer;
@@ -118,7 +118,11 @@ public class Shader {
         return this.uniformLocations;
     }
 
-    public int getUniformLocation(String name) {
+	public Map<String, Uniform> getUniforms() {
+		return this.uniforms;
+	}
+
+	public int getUniformLocation(String name) {
         int location;
         if (!this.uniformLocations.containsKey(name)) {
             location = GL20.glGetUniformLocation(this.id, name);

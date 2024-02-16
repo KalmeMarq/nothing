@@ -2,6 +2,7 @@ package me.kalmemarq.client.screen;
 
 import me.kalmemarq.client.Client;
 import me.kalmemarq.common.network.packet.LoginPacket;
+import me.kalmemarq.server.Server;
 import org.lwjgl.glfw.GLFW;
 
 public class MultiplayerMenu extends Menu {
@@ -43,7 +44,7 @@ public class MultiplayerMenu extends Menu {
         if (key == GLFW.GLFW_KEY_ENTER) {
             if (this.selectedIndex == 2) {
                 if (this.client.connect(this.ip, Integer.parseInt(this.port))) {
-                    this.client.connection.sendPacket(new LoginPacket(this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
+                    this.client.connection.sendPacket(new LoginPacket(Server.PROTOCOL_VERSION, this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
                     this.client.menu = new LoadingMenu(this.client, false);
                 }
             }

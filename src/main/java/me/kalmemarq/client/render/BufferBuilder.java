@@ -59,7 +59,7 @@ public class BufferBuilder {
 		return new BuiltBuffer(MemoryUtil.memSlice(this.buffer, 0, this.offset), this.format, this.primitiveType, this.vertexCount);
 	}
 
-    public void close() {
+    public void dispose() {
         MemoryUtil.memFree(this.buffer);
 		this.disposed = true;
     }

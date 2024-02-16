@@ -32,6 +32,7 @@ import me.kalmemarq.common.network.packet.*;
 import me.kalmemarq.server.IntegratedServer;
 import me.kalmemarq.client.sound.SoundManager;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
@@ -80,8 +81,9 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 	public Level level;
 	public Renderer renderer;
 	public boolean showDebugHud;
+	public Shader blitScreenShader;
 
-    public Client(Path savePath) {
+	public Client(Path savePath) {
         this.savePath = savePath;
         this.rp = DefaultResourcePack.get();
         this.textureManager = new TextureManager();
@@ -89,7 +91,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.soundManager = new SoundManager(this);
         this.settings = new Settings(this.savePath);
         this.settings.load();
-        this.window = new Window(800, 400, "Minicraft");
+        this.window = new Window(800, 400, "Minicraft Not Plus");
         this.imGuiLayer = new ImGuiLayer(this);
 		this.renderer = new Renderer(this);
 		this.thread = Thread.currentThread();
@@ -230,11 +232,12 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.menu = new TitleMenu(this);
         this.font.load();
         this.soundManager.init();
+		this.renderer.setCapabilities(this.window.getCapabilities());
 
         Framebuffer f = new Framebuffer();
         f.create(this.window.getFramebufferWidth(), this.window.getFramebufferHeight());
 
-        Shader shader = new Shader("blit_screen");
+        this.blitScreenShader = new Shader("blit_screen");
 
         while (this.running) {
             if (this.window.shouldClose()) {
@@ -270,7 +273,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
             Renderer.loadMatrixIdentity();
 			Renderer.setMatrixMode(Renderer.MatrixMode.MODELVIEW);
 			Renderer.loadMatrixIdentity();
-            f.draw(shader);
+            f.draw(this.blitScreenShader);
 
             if (this.showImGuiLayer) {
                 this.imGuiLayer.render();
@@ -289,7 +292,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
             }
         }
 
-		shader.close();
+		this.blitScreenShader.close();
         f.close();
         this.close();
     }
@@ -312,8 +315,8 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.settings.save();
         this.disconnect();
 
+		this.renderer.dispose();
         this.imGuiLayer.close();
-
         this.textureManager.close();
         this.soundManager.close();
         this.window.close();

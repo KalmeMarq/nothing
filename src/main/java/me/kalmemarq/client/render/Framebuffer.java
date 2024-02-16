@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GL45;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
@@ -22,8 +23,14 @@ public class Framebuffer {
         this.width = width;
 		this.height = height;
 		
-		this.fbo = GL30.glGenFramebuffers();
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fbo);
+		boolean supportsOpenGL45 = Renderer.getInstance().getCapabilities().OpenGL45;
+		
+		if (supportsOpenGL45) {
+			this.fbo = GL45.glCreateFramebuffers();
+		} else {
+			this.fbo = GL30.glGenFramebuffers();
+        	GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fbo);
+		}
 
         this.txr = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.txr);
@@ -31,20 +38,30 @@ public class Framebuffer {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, width, height, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, 0L);
 
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.txr, 0);
+		if (supportsOpenGL45) {
+			GL45.glNamedFramebufferTexture(this.fbo, GL30.GL_COLOR_ATTACHMENT0, this.txr, 0);
+		} else {
+        	GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.txr, 0);
+		}
 
         this.rbo = GL30.glGenRenderbuffers();
         GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, this.rbo);
         GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, width, height);
 
-        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, this.rbo);
-
+		if (supportsOpenGL45) {
+        	GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, this.rbo);
+		} else {
+			GL45.glNamedFramebufferRenderbuffer(this.fbo, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, this.rbo);
+		}
+		
         int status = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
         if (status != GL30.GL_FRAMEBUFFER_COMPLETE) {
             System.out.println(getErrorStatus(status));
         }
 
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+		if (!supportsOpenGL45) {
+        	GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+		}
 
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(this.vao);
@@ -52,14 +69,14 @@ public class Framebuffer {
         this.vbo = GL30.glGenBuffers();
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.vbo);
 		
-		BufferBuilder bufferBuilder = new BufferBuilder(128);
+		BufferBuilder bufferBuilder = Renderer.getInstance().createBufferBuilder(128);
 		bufferBuilder.vertex(-1.0f, -1.0f, 0.0f).texture(0.0f, 0.0f).next();
 		bufferBuilder.vertex(-1.0f,  1.0f, 0.0f).texture(0.0f, 1.0f).next();
 		bufferBuilder.vertex( 1.0f,  1.0f, 0.0f).texture(1.0f, 1.0f).next();
 		bufferBuilder.vertex( 1.0f, -1.0f, 0.0f).texture(1.0f, 0.0f).next();
 
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferBuilder.end(), GL30.GL_STATIC_DRAW);
-		bufferBuilder.close();
+		bufferBuilder.dispose();
 
         this.ibo = GL30.glGenBuffers();
 

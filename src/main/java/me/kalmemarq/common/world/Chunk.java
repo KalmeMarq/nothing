@@ -24,7 +24,7 @@ public class Chunk {
 	public void generate() {
 		for (int y = 0; y < 8; ++y) {
 			for (int x = 0; x < 8; ++x) {
-				this.tiles[y * 8 + x] = (byte) (Level.RANDOM.nextInt(10) <= 2 ? 2 : Level.RANDOM.nextInt(10) <= 2 ? 3 : 1);
+				this.tiles[y * 8 + x] = (byte) (Level.RANDOM.nextInt(10) <= 1 ? 2 : Level.RANDOM.nextInt(10) <= 1 ? 3 : 1);
 			}
 		}
 	}

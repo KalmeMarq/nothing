@@ -14,9 +14,15 @@ import me.kalmemarq.client.screen.TitleMenu;
 import me.kalmemarq.client.texture.Texture;
 import me.kalmemarq.common.network.packet.MessagePacket;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GLCapabilities;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ImGuiLayer {
     private ImGuiImplGlfw imGuiGlfw;
@@ -28,6 +34,7 @@ public class ImGuiLayer {
     private ImBoolean showAboutWindow = new ImBoolean(false);
     private ImBoolean showMessagesWindow = new ImBoolean(false);
     private ImBoolean showGameInfoWindow = new ImBoolean(false);
+	private ImBoolean showRendererInfoWindow = new ImBoolean(false);
     private ImString messageInput = new ImString();
 
     public ImGuiLayer(Client client) {
@@ -84,12 +91,12 @@ public class ImGuiLayer {
             }
 
             if (ImGui.beginMenu("Game")) {
-                if (ImGui.menuItem("Info")) {
+                if (ImGui.menuItem("Game Info")) {
 					this.showGameInfoWindow.set(true);
                 }
 				
-				if (ImGui.menuItem("Open Title")) {
-                    this.client.menu = new TitleMenu(this.client);
+				if (ImGui.menuItem("Renderer Info")) {
+					this.showRendererInfoWindow.set(true);
                 }
 
                 if (ImGui.menuItem("Messages")) {
@@ -173,7 +180,7 @@ public class ImGuiLayer {
 					}
 					
 					for (Map.Entry<Identifier, Integer> entry : this.client.getSoundManager().getBuffers().entrySet()) {
-						ImGui.text(entry.getKey() + ": " + entry.getValue());
+						ImGui.text(entry.getValue() + ": " + entry.getKey());
 					}
                 }
                 ImGui.end();
@@ -181,7 +188,7 @@ public class ImGuiLayer {
 
             if (this.showAboutWindow.get()) {
                 if (ImGui.begin("About", this.showAboutWindow)) {
-                    ImGui.text("Name: Minicraft");
+                    ImGui.text("Name: Minicraft Not Plus");
                     ImGui.text("Version: 1.0.0");
 
                     ImGui.newLine();
@@ -197,6 +204,35 @@ public class ImGuiLayer {
 					ImGui.text("Window Framebuffer Size: " + this.client.window.getFramebufferWidth() + "x" + this.client.window.getFramebufferHeight());
 					ImGui.text("FPS: " + this.client.currentFps);
 					ImGui.text("TKS: " + this.client.currentTicks);
+				}
+				ImGui.end();
+			}
+
+			if (this.showRendererInfoWindow.get()) {
+				if (ImGui.begin("Renderer", this.showRendererInfoWindow)) {
+					ImGui.text("Vertex Buffers: " + this.client.renderer.getVertexBuffers().size());
+					ImGui.text("Buffer Builders: " + this.client.renderer.getBufferBuilders().size());
+
+					ImGui.newLine();
+					ImGui.text("Blit Screen Shader");
+					ImGui.text("Uniforms");
+					for (Uniform uniform : this.client.blitScreenShader.getUniforms().values()) {
+						ImGui.text(uniform.getName() + ": " + uniform.getLocation());
+					}
+					
+					ImGui.newLine();
+					ImGui.text("GL Capabilities");
+					ImGui.newLine();
+					GLCapabilities caps = Renderer.getInstance().getCapabilities();
+					
+					List<Field> allFields = Arrays.stream(caps.getClass().getDeclaredFields()).filter(field -> field.getType() != long.class).toList();
+					
+					for (Field field : allFields) {
+                        try {
+                            ImGui.text(field.getName() + ": " + field.get(caps));
+                        } catch (IllegalAccessException e) {
+                        }
+                    }
 				}
 				ImGui.end();
 			}

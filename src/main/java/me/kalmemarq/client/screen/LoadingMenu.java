@@ -2,6 +2,7 @@ package me.kalmemarq.client.screen;
 
 import me.kalmemarq.client.Client;
 import me.kalmemarq.common.network.packet.LoginPacket;
+import me.kalmemarq.server.Server;
 
 public class LoadingMenu extends Menu {
 	public LoadingMenu(Client client, boolean doIntegrated) {
@@ -9,7 +10,7 @@ public class LoadingMenu extends Menu {
 
 		Thread doStuff = new Thread(() -> {
 			if (doIntegrated && this.client.startIntegrated()) {
-				this.client.connection.sendPacket(new LoginPacket(this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
+				this.client.connection.sendPacket(new LoginPacket(Server.PROTOCOL_VERSION, this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
 				this.client.integratedServer.run();
 			}
 		});
