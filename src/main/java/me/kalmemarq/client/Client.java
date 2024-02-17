@@ -82,6 +82,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 	public Renderer renderer;
 	public boolean showDebugHud;
 	public Shader blitScreenShader;
+	public DiscordHelper discordHelper;
 
 	public Client(Path savePath) {
         this.savePath = savePath;
@@ -95,6 +96,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.imGuiLayer = new ImGuiLayer(this);
 		this.renderer = new Renderer(this);
 		this.thread = Thread.currentThread();
+		this.discordHelper = new DiscordHelper(this);
     }
 
 	@Override
@@ -221,6 +223,8 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     public void run() {
         this.running = true;
 
+		this.discordHelper.connect();
+		
         long lastFCTime = System.currentTimeMillis();
         long lastTimeTick = System.nanoTime();
         double unprocessed = 0;
@@ -239,6 +243,8 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 
         this.blitScreenShader = new Shader("blit_screen");
 
+		this.discordHelper.setStatus("In Main Menu");
+		
         while (this.running) {
             if (this.window.shouldClose()) {
                 this.running = false;
@@ -299,6 +305,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 
     public void disconnect() {
         if (this.connection != null) {
+			this.discordHelper.setStatus("In Main Menu");
 			this.level = null;
             this.connection.disconnect();
             this.playerList.clear();
@@ -312,6 +319,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     }
 
     public void close() {
+		this.discordHelper.disconnect();
         this.settings.save();
         this.disconnect();
 

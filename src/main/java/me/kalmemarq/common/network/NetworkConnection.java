@@ -7,6 +7,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
 import me.kalmemarq.common.ThreadExecutor;
+import me.kalmemarq.common.logging.LogManager;
+import me.kalmemarq.common.logging.Logger;
 import me.kalmemarq.common.network.packet.Packet;
 import me.kalmemarq.common.network.packet.PacketDecoder;
 import me.kalmemarq.common.network.packet.PacketEncoder;
@@ -20,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 
 public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
+	private static final Logger LOGGER = LogManager.getLogger();
     public NetworkSide side;
     public Channel channel;
     public SocketAddress address;
@@ -70,8 +73,8 @@ public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet msg) throws Exception {
 		if (this.listener != null) {
+			LOGGER.info("[{}] {}", this.side.getOpposite().name(), msg.getClass().getSimpleName());
 			this.executor.execute(() -> msg.apply(this.listener));
-			
 		}
     }
 
@@ -114,9 +117,9 @@ public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
 	
 	public static void addCommonHandlers(ChannelPipeline channelPipeline, NetworkConnection connection) {
 		channelPipeline
-			.addLast("frame_decoder", new PacketFrameDecoder())
+//			.addLast("frame_decoder", new PacketFrameDecoder())
 			.addLast("decoder", new PacketDecoder())
-			.addLast("prepender", new PacketLengthPrepender())
+//			.addLast("prepender", new PacketLengthPrepender())
 			.addLast("encoder", new PacketEncoder())
 			.addLast("handler", connection);
 	}

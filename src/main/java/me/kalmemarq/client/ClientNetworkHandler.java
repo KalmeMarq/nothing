@@ -85,5 +85,6 @@ class ClientNetworkHandler implements PacketListener {
 		this.client.player.setLevel(this.storageLevel);
 		this.storageLevel = null;
 		this.client.menu = null;
+		this.client.discordHelper.setStatus("Playing " + (this.client.integratedServer == null ? " Multiplayer" : "Singleplayer"));
 	}
 }

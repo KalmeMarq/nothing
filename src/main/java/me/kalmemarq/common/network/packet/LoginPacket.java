@@ -16,14 +16,14 @@ public class LoginPacket extends Packet {
 
     @Override
     public void write(PacketByteBuf buffer) {
-		buffer.writeVarInt(this.protocolVersion);
+		buffer.writeInt(this.protocolVersion);
         buffer.writeString(this.username);
         buffer.writeInt(this.color);
     }
 
     @Override
     public void read(PacketByteBuf buffer) {
-		this.protocolVersion = buffer.readVarInt();
+		this.protocolVersion = buffer.readInt();
         this.username = buffer.readString();
         this.color = buffer.readInt();
     }

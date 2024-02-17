@@ -23,6 +23,8 @@ dependencies {
 	implementation "com.fasterxml.jackson.core:jackson-databind:$project.jacksonVersion"
 
 	implementation "io.netty:netty-all:$project.nettyVersion"
+	
+	implementation "com.github.jagrosh:DiscordIPC:$project.discordIPCVersion"
 
     implementation "io.github.spair:imgui-java-binding:$project.imGuiVersion"
     implementation "io.github.spair:imgui-java-lwjgl3:$project.imGuiVersion"

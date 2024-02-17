@@ -6,6 +6,7 @@ import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
@@ -165,6 +166,9 @@ public class Window implements AutoCloseable {
 				e.printStackTrace();
 			}
 		}
+
+		GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
     }
 
 	public void setWindowEventHandler(WindowEventHandler windowEventHandler) {
