@@ -13,7 +13,7 @@ public class KeyboardHandler implements Window.KeyboardEventHandler {
 
     @Override
     public void onKey(int key, int scancode, int action, int mods) {
-        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F4) {
+        if (this.client.debugMode && action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F4) {
             this.client.showImGuiLayer = !this.client.showImGuiLayer;
         }
 

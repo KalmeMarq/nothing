@@ -1,0 +1,194 @@
+{
+  "mainClass": "me.kalmemarq.client.Main",
+  "variables": {
+    "lwjglVersion": "3.3.3",
+    "jomlVersion": "1.10.5",
+    "imguiVersion": "1.86.11",
+    "argOptionParserVersion": "e8a468fef5",
+    "nettyVersion": "4.1.106.Final",
+    "jacksonVersion": "2.16.1",
+    "discordIPCVersion": "a8d6631cc9",
+    "slf4jVersion": "2.0.12",
+    "jsonVersion": "20240205"
+  },
+  "libraries": [
+    {
+      "name": "org.lwjgl:lwjgl:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl/$(lwjglVersion)/lwjgl-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl/$(lwjglVersion)/lwjgl-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-freetype:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-freetype/$(lwjglVersion)/lwjgl-freetype-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-freetype/$(lwjglVersion)/lwjgl-freetype-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-glfw:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-glfw/$(lwjglVersion)/lwjgl-glfw-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-glfw/$(lwjglVersion)/lwjgl-glfw-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-jemalloc:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-jemalloc/$(lwjglVersion)/lwjgl-jemalloc-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-jemalloc/$(lwjglVersion)/lwjgl-jemalloc-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-openal:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-openal/$(lwjglVersion)/lwjgl-openal-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-openal/$(lwjglVersion)/lwjgl-openal-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-opengl:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-opengl/$(lwjglVersion)/lwjgl-opengl-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-opengl/$(lwjglVersion)/lwjgl-opengl-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "org.lwjgl:lwjgl-stb:$(lwjglVersion)",
+      "path": "org/lwjgl/lwjgl-stb/$(lwjglVersion)/lwjgl-stb-$(lwjglVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-stb/$(lwjglVersion)/lwjgl-stb-$(lwjglVersion).jar",
+      "classifier": {
+        "windows": "natives-windows",
+        "osx": "natives-macos",
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "name": "io.netty:netty-all:$(nettyVersion)",
+      "path": "io/netty/netty-all/$(nettyVersion)/netty-all-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-all/$(nettyVersion)/netty-all-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-buffer:$(nettyVersion)",
+      "path": "io/netty/netty-buffer/$(nettyVersion)/netty-buffer-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-buffer/$(nettyVersion)/netty-buffer-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-common:$(nettyVersion)",
+      "path": "io/netty/netty-common/$(nettyVersion)/netty-common-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-common/$(nettyVersion)/netty-common-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-transport:$(nettyVersion)",
+      "path": "io/netty/netty-transport/$(nettyVersion)/netty-transport-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-transport/$(nettyVersion)/netty-transport-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-transport-classes-epoll:$(nettyVersion)",
+      "path": "io/netty/netty-transport-classes-epoll/$(nettyVersion)/netty-transport-classes-epoll-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-transport-classes-epoll/$(nettyVersion)/netty-transport-classes-epoll-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-resolver:$(nettyVersion)",
+      "path": "io/netty/netty-resolver/$(nettyVersion)/netty-resolver-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-resolver/$(nettyVersion)/netty-resolver-$(nettyVersion).jar"
+    },
+    {
+      "name": "io.netty:netty-resolver-dns:$(nettyVersion)",
+      "path": "io/netty/netty-resolver-dns/$(nettyVersion)/netty-resolver-dns-$(nettyVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/netty/netty-resolver-dns/$(nettyVersion)/netty-resolver-dns-$(nettyVersion).jar"
+    },
+    {
+      "name": "org.joml:joml:$(jomlVersion)",
+      "path": "org/joml/joml/$(jomlVersion)/joml-$(jomlVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/joml/joml/$(jomlVersion)/joml-$(jomlVersion).jar"
+    },
+    {
+      "name": "io.github.spair:imgui-java-binding:$(imguiVersion)",
+      "path": "io/github/spair/imgui-java-binding/$(imguiVersion)/imgui-java-binding-$(imguiVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/github/spair/imgui-java-binding/$(imguiVersion)/imgui-java-binding-$(imguiVersion).jar"
+    },
+    {
+      "name": "io.github.spair:imgui-java-lwjgl3:$(imguiVersion)",
+      "path": "io/github/spair/imgui-java-lwjgl3/$(imguiVersion)/imgui-java-lwjgl3-$(imguiVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/github/spair/imgui-java-lwjgl3/$(imguiVersion)/imgui-java-lwjgl3-$(imguiVersion).jar"
+    },
+    {
+      "name": "io.github.spair:imgui-java-natives-windows:$(imguiVersion)",
+      "path": "io/github/spair/imgui-java-natives-windows/$(imguiVersion)/imgui-java-natives-windows-$(imguiVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/github/spair/imgui-java-natives-windows/$(imguiVersion)/imgui-java-natives-windows-$(imguiVersion).jar",
+      "allowIfOs": "windows"
+    },
+    {
+      "name": "io.github.spair:imgui-java-natives-macos:$(imguiVersion)",
+      "path": "io/github/spair/imgui-java-natives-macos/$(imguiVersion)/imgui-java-natives-macos-$(imguiVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/github/spair/imgui-java-natives-macos/$(imguiVersion)/imgui-java-natives-macos-$(imguiVersion).jar",
+      "allowIfOs": "osx"
+    },
+    {
+      "name": "io.github.spair:imgui-java-natives-linux:$(imguiVersion)",
+      "path": "io/github/spair/imgui-java-natives-linux/$(imguiVersion)/imgui-java-natives-linux-$(imguiVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/io/github/spair/imgui-java-natives-linux/$(imguiVersion)/imgui-java-natives-linux-$(imguiVersion).jar",
+      "allowIfOs": "linux"
+    },
+    {
+      "name": "com.fasterxml.jackson.core:jackson-databind:$(jacksonVersion)",
+      "path": "com/fasterxml/jackson/core/jackson-databind/$(jacksonVersion)/jackson-databind-$(jacksonVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/$(jacksonVersion)/jackson-databind-$(jacksonVersion).jar"
+    },
+    {
+      "name": "com.fasterxml.jackson.core:jackson-core:$(jacksonVersion)",
+      "path": "com/fasterxml/jackson/core/jackson-core/$(jacksonVersion)/jackson-core-$(jacksonVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/$(jacksonVersion)/jackson-core-$(jacksonVersion).jar"
+    },
+    {
+      "name": "com.fasterxml.jackson.core:jackson-annotations:$(jacksonVersion)",
+      "path": "com/fasterxml/jackson/core/jackson-annotations/$(jacksonVersion)/jackson-annotations-$(jacksonVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/$(jacksonVersion)/jackson-annotations-$(jacksonVersion).jar"
+    },
+    {
+      "name": "com.github.jagrosh:DiscordIPC:$(discordIPCVersion)",
+      "path": "com/github/jagrosh/DiscordIPC/$(discordIPCVersion)/DiscordIPC-$(discordIPCVersion).jar",
+      "url": "https://jitpack.io/com/github/jagrosh/DiscordIPC/$(discordIPCVersion)/DiscordIPC-$(discordIPCVersion).jar"
+    },
+    {
+      "name": "com.github.KalmeMarq:arg-option-parser:$(argOptionParserVersion)",
+      "path": "com/github/KalmeMarq/arg-option-parser/$(argOptionParserVersion)/arg-option-parser-$(argOptionParserVersion).jar",
+      "url": "https://jitpack.io/com/github/KalmeMarq/arg-option-parser/$(argOptionParserVersion)/arg-option-parser-$(argOptionParserVersion).jar"
+    },
+    {
+      "name": "org.slf4j:slf4j-api:$(slf4jVersion)",
+      "path": "org/slf4j/slf4j-api/$(slf4jVersion)/slf4j-api-$(slf4jVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/$(slf4jVersion)/slf4j-api-$(slf4jVersion).jar"
+    },
+    {
+      "name": "org.slf4j:slf4j-nop:$(slf4jVersion)",
+      "path": "org/slf4j/slf4j-nop/$(slf4jVersion)/slf4j-nop-$(slf4jVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-nop/$(slf4jVersion)/slf4j-nop-$(slf4jVersion).jar"
+    },
+    {
+      "name": "org.json:json:$(jsonVersion)",
+      "path": "org/json/json/$(jsonVersion)/json-$(jsonVersion).jar",
+      "url": "https://repo.maven.apache.org/maven2/org/json/json/$(jsonVersion)/json-$(jsonVersion).jar"
+    }
+  ]
+}

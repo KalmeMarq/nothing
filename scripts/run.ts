@@ -1,6 +1,3 @@
-const resolveFromHere = (path: string) =>
-    import.meta.resolve(path).substring(8);
-
 function exists(path: string) {
     try {
         Deno.statSync(path);
@@ -10,196 +7,97 @@ function exists(path: string) {
     }
 }
 
-Deno.mkdirSync(resolveFromHere("./libs"), { recursive: true });
+function getOsName() {
+    return Deno.build.os == "windows"
+        ? "windows"
+        : Deno.build.os == "darwin"
+        ? "osx"
+        : "linux";
+}
 
-const natives = [];
+Deno.mkdirSync("./libs", { recursive: true });
 
-const deps = [
-    {
-        repository: "https://repo.maven.apache.org/maven2/",
-        libs: [
-            {
-                name: "org.lwjgl:lwjgl:3.3.3",
-                url: "org/lwjgl/lwjgl/3.3.3/lwjgl-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-freetype:3.3.3",
-                url: "org/lwjgl/lwjgl-freetype/3.3.3/lwjgl-freetype-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-glfw:3.3.3",
-                url: "org/lwjgl/lwjgl-glfw/3.3.3/lwjgl-glfw-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-jemalloc:3.3.3",
-                url: "org/lwjgl/lwjgl-jemalloc/3.3.3/lwjgl-jemalloc-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-openal:3.3.3",
-                url: "org/lwjgl/lwjgl-openal/3.3.3/lwjgl-openal-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-opengl:3.3.3",
-                url: "org/lwjgl/lwjgl-opengl/3.3.3/lwjgl-opengl-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "org.lwjgl:lwjgl-stb:3.3.3",
-                url: "org/lwjgl/lwjgl-stb/3.3.3/lwjgl-stb-3.3.3.jar",
-                classifier: "natives-windows",
-            },
-            {
-                name: "io.netty:netty-all:4.1.106.Final",
-                url: "io/netty/netty-all/4.1.106.Final/netty-all-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-buffer:4.1.106.Final",
-                url: "io/netty/netty-buffer/4.1.106.Final/netty-buffer-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-handler:4.1.106.Final",
-                url: "io/netty/netty-handler/4.1.106.Final/netty-handler-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-transport-classes-epoll:4.1.106.Final",
-                url: "io/netty/netty-transport-classes-epoll/4.1.106.Final/netty-transport-classes-epoll-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-resolver:4.1.106.Final",
-                url: "io/netty/netty-resolver/4.1.106.Final/netty-resolver-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-resolver-dns:4.1.106.Final",
-                url: "io/netty/netty-resolver-dns/4.1.106.Final/netty-resolver-dns-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-codec:4.1.106.Final",
-                url: "io/netty/netty-codec/4.1.106.Final/netty-codec-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-codec-dns:4.1.106.Final",
-                url: "io/netty/netty-codec-dns/4.1.106.Final/netty-codec-dns-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-codec-http:4.1.106.Final",
-                url: "io/netty/netty-codec-http/4.1.106.Final/netty-codec-http-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-codec-http2:4.1.106.Final",
-                url: "io/netty/netty-codec-http2/4.1.106.Final/netty-codec-http2-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-common:4.1.106.Final",
-                url: "io/netty/netty-common/4.1.106.Final/netty-common-4.1.106.Final.jar",
-            },
-            {
-                name: "io.netty:netty-transport:4.1.106.Final",
-                url: "io/netty/netty-transport/4.1.106.Final/netty-transport-4.1.106.Final.jar",
-            },
-            {
-                name: "org.joml:joml:1.10.5",
-                url: "org/joml/joml/1.10.5/joml-1.10.5.jar",
-            },
-            {
-                name: "com.google.code.gson:gson:2.10.1",
-                url: "com/google/code/gson/gson/2.10.1/gson-2.10.1.jar",
-            },
-            {
-                name: "org.apache.logging.log4j:log4j-api:2.22.1",
-                url: "org/apache/logging/log4j/log4j-api/2.22.1/log4j-api-2.22.1.jar",
-            },
-            {
-                name: "org.apache.logging.log4j:log4j-core:2.22.1",
-                url: "org/apache/logging/log4j/log4j-core/2.22.1/log4j-core-2.22.1.jar",
-            },
-            {
-                name: "org.apache.logging.log4j:log4j-slf4j-impl:2.22.1",
-                url: "org/apache/logging/log4j/log4j-slf4j-impl/2.22.1/log4j-slf4j-impl-2.22.1.jar",
-            },
-            {
-                name: "org.slf4j:slf4j-api:1.7.36",
-                url: "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
-            },
-            {
-                name: "io.github.spair:imgui-java-binding:1.86.11",
-                url: "io/github/spair/imgui-java-binding/1.86.11/imgui-java-binding-1.86.11.jar",
-            },
-            {
-                name: "io.github.spair:imgui-java-lwjgl3:1.86.11",
-                url: "io/github/spair/imgui-java-lwjgl3/1.86.11/imgui-java-lwjgl3-1.86.11.jar",
-            },
-            {
-                name: "io.github.spair:imgui-java-natives-windows:1.86.11",
-                url: "io/github/spair/imgui-java-natives-windows/1.86.11/imgui-java-natives-windows-1.86.11.jar",
-            },
-        ],
-    },
-    {
-        repository: "https://jitpack.io/",
-        libs: [
-            {
-                name: "com.github.KalmeMarq:arg-option-parser:e8a468fef5",
-                url: "com/github/KalmeMarq/arg-option-parser/e8a468fef5/arg-option-parser-e8a468fef5.jar",
-            },
-        ],
-    },
-];
+const clientJson = JSON.parse(Deno.readTextFileSync("./client.json"));
+
+function parseWithVars(value: string) {
+    return value.replace(/\$\((?<varname>[a-zA-Z_0-9/-]*)\)/g, (_, b) => {
+        return clientJson.variables[b];
+    });
+}
 
 const cp: string[] = [];
 
-for (const dep of deps) {
-    for (const lib of dep.libs) {
-        const localPath = resolveFromHere("./libs/" + lib.url);
-        cp.push(localPath);
-        if (!exists(localPath)) {
-            console.log(`Downloading ${lib.name}...`);
+for (const lib of clientJson["libraries"]) {
+    const libLocalPath = `./libs/${parseWithVars(lib.path)}`;
 
-            Deno.mkdirSync(localPath.substring(0, localPath.lastIndexOf("/")), {
+    if (lib["allowIfOs"] != null) {
+        if (lib["allowIfOs"] != getOsName()) continue;
+    }
+
+    cp.push(libLocalPath);
+
+    if (!exists(libLocalPath)) {
+        console.log(`Downloading ${parseWithVars(lib.name)}`);
+        Deno.mkdirSync(
+            libLocalPath.substring(0, libLocalPath.lastIndexOf("/")),
+            {
                 recursive: true,
-            });
+            }
+        );
+        const data = await(
+            await fetch(parseWithVars(lib.url), {
+                headers: { "Content-Type": "application/octet-stream" },
+            })
+        ).arrayBuffer();
+        Deno.writeFileSync(libLocalPath, new Uint8Array(data));
+    } else console.log(`Checking ${parseWithVars(lib.name)}`);
 
-            const data = await (
-                await fetch(dep.repository + lib.url, {
-                    headers: { "Content-Type": "application/octet-stream" },
-                })
-            ).arrayBuffer();
-            Deno.writeFileSync(localPath, new Uint8Array(data));
-        }
+    if (lib["classifier"] != null) {
+        for (const [native, nativeName] of Object.entries(lib["classifier"])) {
+            if (native != getOsName()) continue;
 
-        if (lib.classifier != null) {
-            const nativesUrl =
-                lib.url.substring(0, lib.url.lastIndexOf(".")) +
+            const nativeLocalPath =
+                libLocalPath.substring(0, libLocalPath.lastIndexOf(".jar")) +
                 "-" +
-                lib.classifier +
+                nativeName +
                 ".jar";
-            const nativesLocalPath = resolveFromHere("./libs/" + nativesUrl); // check cuz natives may be bleeding to the root dir
-            cp.push(nativesLocalPath);
 
-            if (!exists(nativesLocalPath)) {
-                console.log(`Downloading ${lib.name} ${lib.classifier}...`);
+            const nativeUrl = parseWithVars(
+                lib.url.substring(0, lib.url.lastIndexOf(".jar")) +
+                    "-" +
+                    nativeName +
+                    ".jar"
+            );
+
+            cp.push(nativeLocalPath);
+
+            if (!exists(nativeLocalPath)) {
+                console.log(
+                    `Downloading ${parseWithVars(
+                        lib.name
+                    )} ${native} classifier`
+                );
 
                 Deno.mkdirSync(
-                    nativesLocalPath.substring(
+                    nativeLocalPath.substring(
                         0,
-                        nativesLocalPath.lastIndexOf("/")
+                        nativeLocalPath.lastIndexOf("/")
                     ),
                     {
                         recursive: true,
                     }
                 );
 
-                const data = await (
-                    await fetch(dep.repository + nativesUrl, {
+                const data = await(
+                    await fetch(nativeUrl, {
                         headers: { "Content-Type": "application/octet-stream" },
                     })
                 ).arrayBuffer();
-                Deno.writeFileSync(nativesLocalPath, new Uint8Array(data));
-            }
+                Deno.writeFileSync(nativeLocalPath, new Uint8Array(data));
+            } else
+                console.log(
+                    `Checking ${parseWithVars(lib.name)} ${native} classifier`
+                );
         }
     }
 }
@@ -207,8 +105,8 @@ for (const dep of deps) {
 const cmd = new Deno.Command("D:/ProgramsFiles/Java/jdk-17.0.7/bin/java.exe", {
     args: [
         "-cp",
-        cp.join(";") + ";" + resolveFromHere("../build/libs/nothing-1.0.0.jar"),
-        "me.kalmemarq.client.Main",
+        cp.join(";") + ";" + "../build/libs/nothing-1.0.0.jar",
+        clientJson.mainClass,
     ],
     stdin: "inherit",
     stderr: "inherit",

@@ -5,7 +5,11 @@ build/
 !**/src/test/**/build/
 run
 .idea
-scripts/libs
+
+scripts/*
+!scripts/run.ts
+!scripts/client.json
+
 hs_err_*
 imgui.ini
 settings.txt

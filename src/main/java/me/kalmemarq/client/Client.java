@@ -83,9 +83,11 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 	public boolean showDebugHud;
 	public Shader blitScreenShader;
 	public DiscordHelper discordHelper;
+	public final boolean debugMode;
 
-	public Client(Path savePath) {
-        this.savePath = savePath;
+	public Client(boolean debugMode, Path savePath) {
+        this.debugMode = debugMode;
+		this.savePath = savePath;
         this.rp = DefaultResourcePack.get();
         this.textureManager = new TextureManager();
         this.font = new Font(this.textureManager);
