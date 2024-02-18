@@ -87,6 +87,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 	public Shader blitScreenShader;
 	public DiscordHelper discordHelper;
 	public final boolean debugMode;
+	public final MouseHandler mouseHandler;
 
 	public Client(boolean debugMode, Path savePath) {
         this.debugMode = debugMode;
@@ -97,6 +98,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.soundManager = new SoundManager(this);
         this.settings = new Settings(this.savePath);
         this.settings.load();
+		this.mouseHandler = new MouseHandler(this);
         this.window = new Window();
         this.imGuiLayer = new ImGuiLayer(this);
 		this.renderer = new Renderer(this);
@@ -255,7 +257,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 		this.window.init(800, 400, "Minicraft Not Plus");
 		this.window.setWindowEventHandler(this);
         this.window.setKeyboardEventHandler(new KeyboardHandler(this));
-        this.window.setMouseEventHandler(new MouseHandler(this));
+        this.window.setMouseEventHandler(this.mouseHandler);
         this.menu = new TitleMenu(this);
         this.font.load();
         this.soundManager.init();

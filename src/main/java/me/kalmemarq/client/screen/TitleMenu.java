@@ -10,7 +10,6 @@ public class TitleMenu extends Menu {
     public TitleMenu(Client client) {
         super(client);
 		this.menuContainer = new MenuContainer();
-		this.menuContainer.withBackground = true;
 		this.menuContainer.addEntry(new Menu.Entry("Singleplayer", () -> {
 			this.client.menu = new LoadingMenu(this.client, true);
 		}));

@@ -235,7 +235,7 @@ public class Renderer {
 			}
 		}
 		
-		if (this.client.menu != null) this.client.menu.render(this.client.window.getFramebufferWidth() / 3, this.client.window.getFramebufferHeight() / 3, 0, 0);
+		if (this.client.menu != null) this.client.menu.render(this.client.window.getFramebufferWidth() / 3, this.client.window.getFramebufferHeight() / 3, (int) (this.client.mouseHandler.getX() / 3), (int) (this.client.mouseHandler.getY() / 3));
 
 		if (!this.client.window.isFocused()) {
 			Menu.renderFrame(this.client.textureManager, this.client.font, this.client.window.getFramebufferWidth() / 3 / 2, this.client.window.getFramebufferHeight() / 3 / 2 - 20, "Click to Focus".length() * 8 + 16, 24, "Click to Focus", System.currentTimeMillis() / 100 % 4 == 0 ? 0x777777 : 0xFFFFFF);

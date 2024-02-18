@@ -8,13 +8,27 @@ import org.lwjgl.glfw.GLFW;
 public class MultiplayerMenu extends Menu {
 	private final Menu parentScreen;
 	
-    private int selectedIndex;
     private String ip = "";
     private String port = "";
 
     public MultiplayerMenu(Client client, Menu parentScreen) {
         super(client);
 		this.parentScreen = parentScreen;
+		this.menuContainer = new MenuContainer();
+		this.menuContainer.offsetY = 30;
+		this.menuContainer.addEntry(new TextBoxEntry("Server Address", this.ip, 255, "abcdefghijklmnopqrstuvwxyz_:ABCDEFGHIJKLMNOPQRSTUVWXYZ "::contains, newValue -> {
+			this.ip = newValue;
+		}));
+		this.menuContainer.addEntry(new TextBoxEntry("Server Port", this.port, 255, "0123456789"::contains, newValue -> {
+			this.port = newValue;
+		}));
+		this.menuContainer.addEntry(new EmptyEntry());
+		this.menuContainer.addEntry(new Entry("Connect to Server", () -> {
+			if (this.client.connect(this.ip, Integer.parseInt(this.port))) {
+				this.client.connection.sendPacket(new LoginPacket(Server.PROTOCOL_VERSION, this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
+				this.client.menu = new LoadingMenu(this.client, false);
+			}
+		}));
     }
 
     @Override
@@ -23,50 +37,7 @@ public class MultiplayerMenu extends Menu {
             this.client.menu = this.parentScreen;
             return;
         }
-
-        if (key == GLFW.GLFW_KEY_DOWN) {
-            this.selectedIndex = (this.selectedIndex + 1) % 3;
-        } else if (key == GLFW.GLFW_KEY_UP) {
-            --this.selectedIndex;
-            if (this.selectedIndex < 0) this.selectedIndex = 2;
-        }
-
-        if (key == GLFW.GLFW_KEY_BACKSPACE) {
-            if (this.selectedIndex == 0 && !this.ip.isEmpty()) {
-                this.ip = this.ip.substring(0, this.ip.length() - 1);
-            }
-
-            if (this.selectedIndex == 1 && !this.port.isEmpty()) {
-                this.port = this.port.substring(0, this.port.length() - 1);
-            }
-        }
-
-        if (key == GLFW.GLFW_KEY_ENTER) {
-            if (this.selectedIndex == 2) {
-                if (this.client.connect(this.ip, Integer.parseInt(this.port))) {
-                    this.client.connection.sendPacket(new LoginPacket(Server.PROTOCOL_VERSION, this.client.settings.username, this.client.settings.playerColorR << 16 | this.client.settings.playerColorG << 8 | this.client.settings.playerColorB));
-                    this.client.menu = new LoadingMenu(this.client, false);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void charTyped(int codepoint) {
-        if (this.selectedIndex == 0) {
-            this.ip += Character.toString(codepoint);
-        } else if (this.selectedIndex == 1) {
-            this.port += Character.toString(codepoint);
-        }
-    }
-
-    @Override
-    public void render(int screenWidth, int screenHeight, int mouseX, int mouseY) {
-		super.render(screenWidth, screenHeight, mouseX, mouseY);
-
-        this.font.drawText("Server IP: " + this.ip, 20, 30, this.selectedIndex == 0 ? 0xFFFFFF : 0x909090);
-        this.font.drawText("Server Port: " + this.port, 20, 44, this.selectedIndex == 1 ? 0xFFFFFF : 0x909090);
-
-        this.font.drawText("Connect to Server", 20, 72, this.selectedIndex == 2 && !this.ip.isEmpty() && !this.port.isEmpty() ? 0xFFFFFF : 0x909090);
+		
+		super.keyPressed(key, mods);
     }
 }

@@ -32,4 +32,12 @@ public class MouseHandler implements Window.MouseEventHandler {
 	@Override
 	public void onScroll(double x, double y) {
 	}
+
+	public double getX() {
+		return this.x;
+	}
+
+	public double getY() {
+		return this.y;
+	}
 }
