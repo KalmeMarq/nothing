@@ -91,7 +91,7 @@ public class PacketByteBuf {
         return this.parent.readFloat();
     }
 
-    public void writeDouble(int value) {
+    public void writeDouble(double value) {
         this.parent.writeDouble(value);
     }
 

@@ -73,7 +73,7 @@ public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet msg) throws Exception {
 		if (this.listener != null) {
-			LOGGER.info("[{}] {}", this.side.getOpposite().name(), msg.getClass().getSimpleName());
+//			LOGGER.info("[{}] {}", this.side.getOpposite().name(), msg.getClass().getSimpleName());
 			this.executor.execute(() -> msg.apply(this.listener));
 		}
     }
@@ -82,6 +82,7 @@ public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         System.out.println(cause.getMessage());
+		this.disconnect();
     }
 
     public SocketAddress getAddress() {
@@ -117,9 +118,9 @@ public class NetworkConnection extends SimpleChannelInboundHandler<Packet> {
 	
 	public static void addCommonHandlers(ChannelPipeline channelPipeline, NetworkConnection connection) {
 		channelPipeline
-//			.addLast("frame_decoder", new PacketFrameDecoder())
+			.addLast("frame_decoder", new PacketFrameDecoder())
 			.addLast("decoder", new PacketDecoder())
-//			.addLast("prepender", new PacketLengthPrepender())
+			.addLast("prepender", new PacketLengthPrepender())
 			.addLast("encoder", new PacketEncoder())
 			.addLast("handler", connection);
 	}

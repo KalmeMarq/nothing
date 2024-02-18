@@ -10,6 +10,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import me.kalmemarq.client.screen.ChatMenu;
 import me.kalmemarq.common.logging.LogManager;
 import me.kalmemarq.common.logging.Logger;
 import me.kalmemarq.common.world.Level;
@@ -31,6 +32,7 @@ import me.kalmemarq.client.screen.TitleMenu;
 import me.kalmemarq.common.network.packet.*;
 import me.kalmemarq.server.IntegratedServer;
 import me.kalmemarq.client.sound.SoundManager;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryUtil;
@@ -62,6 +64,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     public final List<String> messages = new ArrayList<>();
 
     public NetworkConnection connection;
+	public ClientNetworkHandler connHandler;
     public IntegratedServer integratedServer;
     public boolean hasOpenToLan = false;
     public final ImString connectionText = new ImString();
@@ -94,7 +97,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         this.soundManager = new SoundManager(this);
         this.settings = new Settings(this.savePath);
         this.settings.load();
-        this.window = new Window(800, 400, "Minicraft Not Plus");
+        this.window = new Window();
         this.imGuiLayer = new ImGuiLayer(this);
 		this.renderer = new Renderer(this);
 		this.thread = Thread.currentThread();
@@ -120,7 +123,12 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     }
 
     public boolean connect(String ip, int port) {
-        if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup();
+        if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup(0, (runnable) -> {
+			Thread thread = new Thread(runnable);
+			thread.setName("Netty Client IO");
+			thread.setDaemon(true);
+			return thread;
+		});
 
         NetworkConnection connection = new NetworkConnection(NetworkSide.CLIENT, this);
 		ClientNetworkHandler handler = new ClientNetworkHandler(this, connection);
@@ -143,6 +151,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         try {
             bootstrap.connect(ip, port).syncUninterruptibly();
             this.connection = connection;
+			this.connHandler = handler;
             this.connectionText.set("");
         } catch (Exception e) {
             this.connectionText.set(e.getMessage());
@@ -163,7 +172,12 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 
         this.integratedServer = server;
 
-        if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup();
+        if (this.eventLoopGroup == null) this.eventLoopGroup = new NioEventLoopGroup(0, (runnable) -> {
+			Thread thread = new Thread(runnable);
+			thread.setName("Netty Client IO");
+			thread.setDaemon(true);
+			return thread;
+		});
 
         NetworkConnection connection = new NetworkConnection(NetworkSide.CLIENT, this);
 		ClientNetworkHandler handler = new ClientNetworkHandler(this, connection);
@@ -186,6 +200,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
             bootstrap.connect(address).syncUninterruptibly();
             this.connectionText.set("");
             this.connection = connection;
+            this.connHandler = handler;
         } catch (Exception e) {
             this.connectionText.set(e.getMessage());
             return false;
@@ -204,6 +219,10 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 			
 			if (this.player != null) {
 				this.player.tickClient(this);
+			}
+			
+			if (this.menu == null && GLFW.glfwGetKey(this.window.getHandle(), GLFW.GLFW_KEY_T) == GLFW.GLFW_PRESS) {
+				this.menu = new ChatMenu(this);
 			}
         }
 
@@ -232,6 +251,8 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
         double unprocessed = 0;
         int frameCounter = 0;
         int tickCounter = 0;
+		
+		this.window.init(800, 400, "Minicraft Not Plus");
 		this.window.setWindowEventHandler(this);
         this.window.setKeyboardEventHandler(new KeyboardHandler(this));
         this.window.setMouseEventHandler(new MouseHandler(this));
@@ -241,7 +262,6 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
 		this.renderer.setCapabilities(this.window.getCapabilities());
 
         Framebuffer f = new Framebuffer();
-        f.create(this.window.getFramebufferWidth(), this.window.getFramebufferHeight());
 
         this.blitScreenShader = new Shader("blit_screen");
 
@@ -314,6 +334,7 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
             this.player = null;
             if (this.integratedServer != null) this.integratedServer.close();
             this.connection = null;
+            this.connHandler = null;
             this.integratedServer = null;
             this.messages.clear();
             this.hasOpenToLan = false;
@@ -321,9 +342,9 @@ public class Client extends ThreadExecutor implements Window.WindowEventHandler 
     }
 
     public void close() {
-		this.discordHelper.disconnect();
         this.settings.save();
         this.disconnect();
+		this.discordHelper.disconnect();
 
 		this.renderer.dispose();
         this.imGuiLayer.close();

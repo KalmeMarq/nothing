@@ -7,7 +7,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import me.kalmemarq.common.ChatMessage;
+import me.kalmemarq.common.entity.TextParticle;
 import me.kalmemarq.common.world.Level;
 import me.kalmemarq.common.ThreadExecutor;
 import me.kalmemarq.common.network.NetworkConnection;
@@ -20,6 +22,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,6 +30,7 @@ public class Server extends ThreadExecutor {
 	public static final int PROTOCOL_VERSION = 1;
 
     public final Deque<NetworkConnection> connections = new ConcurrentLinkedDeque<>();
+    public final Map<NetworkConnection, ServerNetworkHandler> connectionHandlers = new ConcurrentHashMap<>();
     protected final AtomicBoolean running = new AtomicBoolean(false);
     public final List<ChatMessage> messages = new ArrayList<>();
     protected EventLoopGroup eventLoopGroup;
@@ -46,7 +50,12 @@ public class Server extends ThreadExecutor {
 	}
 
     protected void onSend(String msg) {
-        if (msg.startsWith("/kick ")) {
+		if (msg.startsWith("/spawnparticle")) {
+			for (NetworkConnection connection : this.playerManager.connectionMap.values()) {
+				TextParticle textParticle = new TextParticle(20, 20, 60, "Hey Buddy", 0xFF0000);
+				connection.sendPacket(new TextParticlePacket("Hey Buddy", 20, 20, textParticle.lifetime, textParticle.xa, textParticle.ya, textParticle.za, textParticle.color));
+			}
+		} else if (msg.startsWith("/kick ")) {
             if (msg.length() > "/kick ".length()) {
                 var username = msg.substring(6);
 
@@ -74,7 +83,8 @@ public class Server extends ThreadExecutor {
             while (iter.hasNext()) {
                 NetworkConnection connection = iter.next();
                 if (!connection.isConnected()) {
-                    iter.remove();
+					iter.remove();
+                    this.connectionHandlers.remove(connection);
                     System.out.println(connection.getAddress() + " has disconnected");
                 }
             }
@@ -92,7 +102,12 @@ public class Server extends ThreadExecutor {
     }
 
     public void startAt(String ip, int port, boolean showGui, boolean useStdIn) {
-        this.eventLoopGroup = new NioEventLoopGroup();
+        this.eventLoopGroup = new NioEventLoopGroup(0, (runnable) -> {
+			Thread thread = new Thread(runnable);
+			thread.setName("Netty Server IO");
+			thread.setDaemon(true);
+			return thread;
+		});
 		this.running.set(true);
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(this.eventLoopGroup)
@@ -104,6 +119,7 @@ public class Server extends ThreadExecutor {
 						ServerNetworkHandler handler = new ServerNetworkHandler(Server.this, connection);
 						connection.setListener(handler);
                         Server.this.connections.add(connection);
+						Server.this.connectionHandlers.put(connection, handler);
                       	Server.this.printMessage("New connection at " + ch.remoteAddress());
 						NetworkConnection.addCommonHandlers(ch.pipeline(), connection);
 					}
@@ -135,6 +151,10 @@ public class Server extends ThreadExecutor {
 	
 	public void tick() {
 		this.checkConnections();
+		
+		for (ServerNetworkHandler handler : this.connectionHandlers.values()) {
+			handler.tick();
+		}
 	}
 
     private void disconnectAll() {
@@ -169,6 +189,8 @@ public class Server extends ThreadExecutor {
 
 			if (!connection.isConnected()) {
 				iter.remove();
+				this.connectionHandlers.remove(connection);
+				
 				if (this.playerManager.connectionMapN.containsKey(connection)) {
 					var value = this.playerManager.connectionMapN.get(connection);
 

@@ -97,6 +97,11 @@ public class Framebuffer {
     }
 
     public void resize(int width, int height) {
+		if (this.fbo == -1) {
+			this.create(width, height);
+			return;
+		}
+		
     	this.width = Math.max(width, 1);
 		this.height = Math.max(height, 1);
 

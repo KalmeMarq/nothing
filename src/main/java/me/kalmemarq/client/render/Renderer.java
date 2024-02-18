@@ -4,7 +4,9 @@ import me.kalmemarq.common.Identifier;
 import me.kalmemarq.common.Utils;
 import me.kalmemarq.client.Client;
 import me.kalmemarq.client.screen.Menu;
+import me.kalmemarq.common.entity.Entity;
 import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.entity.TextParticle;
 import me.kalmemarq.common.logging.LogManager;
 import me.kalmemarq.common.logging.Logger;
 import me.kalmemarq.common.tile.Tile;
@@ -157,7 +159,7 @@ public class Renderer {
 			GL11.glVertex3f(this.client.player.x + 8, this.client.player.y + 8, 0);
 			GL11.glTexCoord2f(u1, v0);
 			GL11.glVertex3f(this.client.player.x + 8, this.client.player.y - 8, 0);
-
+			
 			for (PlayerEntity p : this.client.playerList.values()) {
 				u = p.dir == 2 ? 3 * 16 : p.dir * 16;
 				v = 0;
@@ -186,6 +188,16 @@ public class Renderer {
 			}
 
 			GL11.glEnd();
+
+
+			for (Entity entity : this.client.level.entities) {
+				if (entity instanceof PlayerEntity) continue;
+
+				if (entity instanceof TextParticle textParticle) {
+					this.client.font.drawText(textParticle.text, (int) (textParticle.x - textParticle.text.length() * 4), (int) (textParticle.y - (int) textParticle.zz), textParticle.color);
+				}
+			}
+			
 			GL11.glDisable(GL11.GL_BLEND);
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 

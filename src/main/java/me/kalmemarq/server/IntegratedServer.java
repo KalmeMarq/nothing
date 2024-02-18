@@ -24,16 +24,12 @@ public class IntegratedServer extends Server {
 			.childHandler(new ChannelInitializer<>() {
 				@Override
 				protected void initChannel(Channel ch) throws Exception {
-					try {
-						ch.config().setOption(ChannelOption.TCP_NODELAY, true);
-					} catch (ChannelException channelException) {
-						// empty catch block
-					}
 					NetworkConnection connection = new NetworkConnection(NetworkSide.SERVER, IntegratedServer.this);
 					ServerNetworkHandler handler = new ServerNetworkHandler(IntegratedServer.this, connection);
 					connection.setListener(handler);
 					IntegratedServer.this.connections.add(connection);
-					System.out.println("New connection at " + ch.remoteAddress());
+					IntegratedServer.this.connectionHandlers.put(connection, handler);
+					IntegratedServer.this.printMessage("New connection at " + ch.remoteAddress());
 					NetworkConnection.addCommonHandlers(ch.pipeline(), connection);
 				}
 			});
@@ -45,7 +41,12 @@ public class IntegratedServer extends Server {
 
 	public SocketAddress startLocal() {
 		this.isIntegrated = true;
-		this.eventLoopGroup = new NioEventLoopGroup();
+		this.eventLoopGroup = new NioEventLoopGroup(0, (runnable) -> {
+			Thread thread = new Thread(runnable);
+			thread.setName("Netty Integrated Server IO");
+			thread.setDaemon(true);
+			return thread;
+		});
 		this.running.set(true);
 		ServerBootstrap bootstrap = new ServerBootstrap()
 			.group(this.eventLoopGroup)
@@ -61,12 +62,13 @@ public class IntegratedServer extends Server {
 					ServerNetworkHandler handler = new ServerNetworkHandler(IntegratedServer.this, connection);
 					connection.setListener(handler);
 					IntegratedServer.this.connections.add(connection);
+					IntegratedServer.this.connectionHandlers.put(connection, handler);
 					System.out.println("New connection at " + ch.remoteAddress());
 					ch.pipeline().addLast("packet_handler", connection);
 				}
 			});
 
-		this.level = new Level(128, 128);
+		this.level = new Level(8 * 12, 8 * 12);
 		this.level.generate();
 
 		try {

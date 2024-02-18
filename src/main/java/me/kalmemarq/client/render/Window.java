@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 public class Window implements AutoCloseable {
-    private final long handle;
+    private long handle;
 
 	private int windowedX;
 	private int windowedY;
@@ -38,45 +38,48 @@ public class Window implements AutoCloseable {
 	private boolean currentFullscreen;
 	private GLCapabilities capabilities;
 
-    public Window(int width, int height, String title) {
-        if (!GLFW.glfwInit()) {
-            throw new IllegalStateException("Could not init GLFW");
-        }
+    public Window() {
+    }
+	
+	public void init(int width, int height, String title) {
+		if (!GLFW.glfwInit()) {
+			throw new IllegalStateException("Could not init GLFW");
+		}
 
-        GLFW.glfwDefaultWindowHints();
-        this.handle = GLFW.glfwCreateWindow(width, height, title, 0L, 0L);
+		GLFW.glfwDefaultWindowHints();
+		this.handle = GLFW.glfwCreateWindow(width, height, title, 0L, 0L);
 
-        GLFW.glfwMakeContextCurrent(this.handle);
-        GLFW.glfwSwapInterval(1);
+		GLFW.glfwMakeContextCurrent(this.handle);
+		GLFW.glfwSwapInterval(1);
 
-        GLFW.glfwSetMouseButtonCallback(this.handle, (_w, button, action, mods) -> {
-           if (this.mouseEventHandler != null)
-               this.mouseEventHandler.onMouseButton(button, action, mods);
-        });
+		GLFW.glfwSetMouseButtonCallback(this.handle, (_w, button, action, mods) -> {
+			if (this.mouseEventHandler != null)
+				this.mouseEventHandler.onMouseButton(button, action, mods);
+		});
 
-        GLFW.glfwSetCursorPosCallback(this.handle, (_w, x, y) -> {
-            if (this.mouseEventHandler != null)
-                this.mouseEventHandler.onCursorPos(x, y);
-        });
+		GLFW.glfwSetCursorPosCallback(this.handle, (_w, x, y) -> {
+			if (this.mouseEventHandler != null)
+				this.mouseEventHandler.onCursorPos(x, y);
+		});
 
-        GLFW.glfwSetKeyCallback(this.handle, (_w, key, scancode, action, mods) -> {
-            if (this.keyboardEventHandler != null)
-                this.keyboardEventHandler.onKey(key, scancode, action, mods);
-        });
+		GLFW.glfwSetKeyCallback(this.handle, (_w, key, scancode, action, mods) -> {
+			if (this.keyboardEventHandler != null)
+				this.keyboardEventHandler.onKey(key, scancode, action, mods);
+		});
 
-        GLFW.glfwSetCharCallback(this.handle, (_w, codepoint) -> {
-            if (this.keyboardEventHandler != null)
-                this.keyboardEventHandler.onCharTyped(codepoint);
-        });
-		
+		GLFW.glfwSetCharCallback(this.handle, (_w, codepoint) -> {
+			if (this.keyboardEventHandler != null)
+				this.keyboardEventHandler.onCharTyped(codepoint);
+		});
+
 		GLFW.glfwSetFramebufferSizeCallback(this.handle, (_w, w, h) -> {
 			this.framebufferWidth = w;
 			this.framebufferHeight = h;
-			
+
 			if (this.windowEventHandler != null) this.windowEventHandler.onResize();
 		});
 
-        this.capabilities = GL.createCapabilities();
+		this.capabilities = GL.createCapabilities();
 
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer wP = stack.mallocInt(1);
@@ -87,20 +90,20 @@ public class Window implements AutoCloseable {
 			this.width = wP.get(0);
 			this.height = hP.get(0);
 		}
-		
+
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer wP = stack.mallocInt(1);
 			IntBuffer hP = stack.mallocInt(1);
-			
+
 			GLFW.glfwGetFramebufferSize(this.handle, wP, hP);
-			
+
 			this.framebufferWidth = wP.get(0);
 			this.framebufferHeight = hP.get(0);
 		}
-		
-		
+
+
 		this.focused = GLFW.glfwGetWindowAttrib(this.handle, GLFW.GLFW_FOCUSED) != 0;
-		
+
 		GLFW.glfwSetWindowFocusCallback(this.handle, (_w, focused) -> {
 			this.focused = focused;
 			if (this.windowEventHandler != null) this.windowEventHandler.onFocusChanged();
@@ -115,61 +118,61 @@ public class Window implements AutoCloseable {
 			this.x = xP.get(0);
 			this.y = yP.get(0);
 		}
-		
+
 		GLFW.glfwSetWindowPosCallback(this.handle, (_w, x, y) -> {
 			this.x = x;
 			this.y = y;
 		});
 
 		var rp = DefaultResourcePack.get();
-		
-		try (MemoryStack stack = MemoryStack.stackPush()) {
-			IntBuffer wP = stack.mallocInt(1);
-			IntBuffer hP = stack.mallocInt(1);
-			IntBuffer cP = stack.mallocInt(1);
 
-			try (GLFWImage.Buffer icons = GLFWImage.malloc(3)) {
-				ByteBuffer icon16Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon16.png").get().getInputStream());
-				ByteBuffer icon16Pixels = STBImage.stbi_load_from_memory(icon16Data, wP, hP, cP, 4);
+				try (MemoryStack stack = MemoryStack.stackPush()) {
+					IntBuffer wP = stack.mallocInt(1);
+					IntBuffer hP = stack.mallocInt(1);
+					IntBuffer cP = stack.mallocInt(1);
 
-				icons.position(0);
-				icons.width(16);
-				icons.height(16);
-				icons.pixels(icon16Pixels);
+					try (GLFWImage.Buffer icons = GLFWImage.malloc(3)) {
+						ByteBuffer icon16Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon16.png").get().getInputStream());
+						ByteBuffer icon16Pixels = STBImage.stbi_load_from_memory(icon16Data, wP, hP, cP, 4);
 
-				ByteBuffer icon32Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon32.png").get().getInputStream());
-				ByteBuffer icon32Pixels = STBImage.stbi_load_from_memory(icon32Data, wP, hP, cP, 4);
+						icons.position(0);
+						icons.width(16);
+						icons.height(16);
+						icons.pixels(icon16Pixels);
 
-				icons.position(1);
-				icons.width(32);
-				icons.height(32);
-				icons.pixels(icon32Pixels);
+						ByteBuffer icon32Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon32.png").get().getInputStream());
+						ByteBuffer icon32Pixels = STBImage.stbi_load_from_memory(icon32Data, wP, hP, cP, 4);
 
-				ByteBuffer icon64Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon64.png").get().getInputStream());
-				ByteBuffer icon64Pixels = STBImage.stbi_load_from_memory(icon64Data, wP, hP, cP, 4);
+						icons.position(1);
+						icons.width(32);
+						icons.height(32);
+						icons.pixels(icon32Pixels);
 
-				icons.position(2);
-				icons.width(64);
-				icons.height(64);
-				icons.pixels(icon64Pixels);
+						ByteBuffer icon64Data = Client.getByteBufferFromInputStream(rp.getResource("assets/minicraft/icons/icon64.png").get().getInputStream());
+						ByteBuffer icon64Pixels = STBImage.stbi_load_from_memory(icon64Data, wP, hP, cP, 4);
 
-				icons.position(0);
-				GLFW.glfwSetWindowIcon(this.handle, icons);
+						icons.position(2);
+						icons.width(64);
+						icons.height(64);
+						icons.pixels(icon64Pixels);
 
-				STBImage.stbi_image_free(icon16Pixels);
-				STBImage.stbi_image_free(icon32Pixels);
-				STBImage.stbi_image_free(icon64Pixels);
-				MemoryUtil.memFree(icon16Data);
-				MemoryUtil.memFree(icon32Data);
-				MemoryUtil.memFree(icon64Data);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+						icons.position(0);
+						GLFW.glfwSetWindowIcon(this.handle, icons);
+
+						STBImage.stbi_image_free(icon16Pixels);
+						STBImage.stbi_image_free(icon32Pixels);
+						STBImage.stbi_image_free(icon64Pixels);
+						MemoryUtil.memFree(icon16Data);
+						MemoryUtil.memFree(icon32Data);
+						MemoryUtil.memFree(icon64Data);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 
 		GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-    }
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);		
+	}
 
 	public void setWindowEventHandler(WindowEventHandler windowEventHandler) {
 		this.windowEventHandler = windowEventHandler;

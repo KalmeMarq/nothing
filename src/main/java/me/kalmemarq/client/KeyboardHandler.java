@@ -17,15 +17,15 @@ public class KeyboardHandler implements Window.KeyboardEventHandler {
             this.client.showImGuiLayer = !this.client.showImGuiLayer;
         }
 
-		if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F3) {
+		if (action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_F3) {
 			this.client.showDebugHud = !this.client.showDebugHud;
 		}
 
-		if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_F11) {
+		if (action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_F11) {
 			this.client.window.toggleFullscreen();
 		}
 
-        if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_ESCAPE && this.client.connection != null && this.client.menu == null) {
+        if (action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_ESCAPE && this.client.connection != null && this.client.menu == null) {
             this.client.menu = new PauseMenu(this.client);
         }
 

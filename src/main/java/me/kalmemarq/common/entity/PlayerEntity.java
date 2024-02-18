@@ -1,6 +1,7 @@
 package me.kalmemarq.common.entity;
 
 import me.kalmemarq.client.Client;
+import me.kalmemarq.common.network.packet.AttackPacket;
 import me.kalmemarq.common.tile.Tile;
 import me.kalmemarq.common.tile.Tiles;
 import org.lwjgl.glfw.GLFW;
@@ -14,6 +15,7 @@ public class PlayerEntity extends MobEntity {
 	public int maxStamina = 10;
 	public int hunger = 2;
 	public int maxHunger = 10;
+	public int attackTime = 0;
 	
 	public void tickClient(Client client) {
 		this.prevX = this.x;
@@ -24,25 +26,51 @@ public class PlayerEntity extends MobEntity {
 		float xa = 0;
 		float ya = 0;
 
-		if (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_W) != GLFW.GLFW_RELEASE
-		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_UP) != GLFW.GLFW_RELEASE) {
+		if (client.menu == null && (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_W) != GLFW.GLFW_RELEASE
+		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_UP) != GLFW.GLFW_RELEASE)) {
 			ya -= 1;
 		}
 
-		if (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_S) != GLFW.GLFW_RELEASE
-		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_DOWN) != GLFW.GLFW_RELEASE) {
+		if (client.menu == null && (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_S) != GLFW.GLFW_RELEASE
+		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_DOWN) != GLFW.GLFW_RELEASE)) {
 			ya += 1;
 		}
 
-		if (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_D) != GLFW.GLFW_RELEASE
-		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_RIGHT) != GLFW.GLFW_RELEASE) {
+		if (client.menu == null && (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_D) != GLFW.GLFW_RELEASE
+		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_RIGHT) != GLFW.GLFW_RELEASE)) {
 			xa += 1;
 		}
 
-		if (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_A) != GLFW.GLFW_RELEASE
-		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_LEFT) != GLFW.GLFW_RELEASE) {
+		if (client.menu == null && (GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_A) != GLFW.GLFW_RELEASE
+		|| GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_LEFT) != GLFW.GLFW_RELEASE)) {
 			xa -= 1;
 		}
+
+		if (client.menu == null && this.attackTime == 0 && GLFW.glfwGetKey(client.window.getHandle(), GLFW.GLFW_KEY_ENTER) == GLFW.GLFW_PRESS) {
+			this.attackTime = 10;
+			float tx = this.x;
+			float ty = this.y;
+			
+			if (this.dir == 2) {
+				tx -= 1;
+			}
+
+			if (this.dir == 3) {
+				tx += 1;
+			}
+
+			if (this.dir == 1) {
+				ty -= 1;
+			}
+
+			if (this.dir == 0) {
+				ty += 1;
+			}
+			
+			client.connHandler.sendPacket(new AttackPacket((int) (tx / 16.0f), (int) (ty / 16.0f), 3));
+		}
+
+		if (this.attackTime > 0) this.attackTime -= 1;
 
 		if (xa < 0) this.dir = 2;
 		if (xa > 0) this.dir = 3;

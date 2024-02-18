@@ -15,7 +15,7 @@ public class PacketLengthPrepender extends MessageToByteEncoder<ByteBuf> {
 		if (headerLen > 3) {
 			throw new IllegalArgumentException("Unable to fit " + bodyLen + " into 3");
 		}
-		
+
 		PacketByteBuf wrapper = new PacketByteBuf(out);
 		wrapper.ensureWritable(headerLen + bodyLen);
 		wrapper.writeInt(bodyLen);

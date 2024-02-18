@@ -1,5 +1,7 @@
 package me.kalmemarq.common.network.packet;
 
+import me.kalmemarq.common.entity.TextParticle;
+
 public interface PacketListener {
     default void onMessage(MessagePacket packet) {
     }
@@ -32,5 +34,14 @@ public interface PacketListener {
 	}
 	
 	default void onLevelInfo(LevelInfoPacket packet) {
+	}
+	
+	default void onTextParticle(TextParticlePacket packet) {
+	}
+
+	default void onAttack(AttackPacket packet) {
+	}
+
+	default void onTileUpdate(TileUpdatePacket packet) {
 	}
 }

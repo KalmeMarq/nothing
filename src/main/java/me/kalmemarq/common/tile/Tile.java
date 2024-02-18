@@ -1,5 +1,7 @@
 package me.kalmemarq.common.tile;
 
+import me.kalmemarq.common.entity.PlayerEntity;
+import me.kalmemarq.common.world.Level;
 import org.lwjgl.opengl.GL11;
 
 public class Tile {
@@ -7,6 +9,10 @@ public class Tile {
 	}
 	
 	public boolean isSolid() {
+		return false;
+	}
+	
+	public boolean interact(Level level, int xt, int yt, PlayerEntity player) {
 		return false;
 	}
 	

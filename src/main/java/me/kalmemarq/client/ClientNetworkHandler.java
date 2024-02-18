@@ -1,5 +1,6 @@
 package me.kalmemarq.client;
 
+import me.kalmemarq.common.entity.TextParticle;
 import me.kalmemarq.common.world.Chunk;
 import me.kalmemarq.common.world.Level;
 import me.kalmemarq.common.entity.PlayerEntity;
@@ -7,7 +8,7 @@ import me.kalmemarq.client.screen.DisconnectedMenu;
 import me.kalmemarq.common.network.NetworkConnection;
 import me.kalmemarq.common.network.packet.*;
 
-class ClientNetworkHandler implements PacketListener {
+public class ClientNetworkHandler implements PacketListener {
     private final Client client;
     private final NetworkConnection connection;
 	private Level storageLevel;
@@ -16,6 +17,20 @@ class ClientNetworkHandler implements PacketListener {
         this.client = client;
         this.connection = connection;
     }
+	
+	public void sendPacket(Packet packet) {
+		this.connection.sendPacket(packet);
+	}
+
+	@Override
+	public void onTileUpdate(TileUpdatePacket packet) {
+		System.out.println("Hey update this shiez; " + packet.getTileX() + ":" + packet.getTileY() + ":" + packet.getId());
+		System.out.println("OLD: " + this.client.level.getTileId(packet.getTileX(), packet.getTileY()));
+		
+		this.client.level.setTileId(packet.getTileX(), packet.getTileY(), packet.getId());
+		this.client.level.setData(packet.getTileX(), packet.getTileY(), packet.getData());
+		System.out.println("NEW: " + this.client.level.getTileId(packet.getTileX(), packet.getTileY()));
+	}
 
 	@Override
 	public void onDisconnect(DisconnectPacket packet) {
@@ -58,7 +73,8 @@ class ClientNetworkHandler implements PacketListener {
 
 	@Override
 	public void onMessage(MessagePacket packet) {
-		this.client.messages.add("[" + Client.DATE_FORMATTER.format(packet.getTimestamp()) + "] " + packet.getMessage());
+//		this.client.messages.add("[" + Client.DATE_FORMATTER.format(packet.getTimestamp()) + "] " + packet.getMessage());
+		this.client.messages.add(packet.getMessage());
 	}
 
 	@Override
@@ -86,5 +102,10 @@ class ClientNetworkHandler implements PacketListener {
 		this.storageLevel = null;
 		this.client.menu = null;
 		this.client.discordHelper.setStatus("Playing " + (this.client.integratedServer == null ? " Multiplayer" : "Singleplayer"));
+	}
+
+	@Override
+	public void onTextParticle(TextParticlePacket packet) {
+		this.client.level.addEntity(new TextParticle(packet));
 	}
 }
